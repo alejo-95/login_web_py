@@ -27,8 +27,9 @@ header{
     justify-content: space-between;
     z-index: 1000;
     border-radius: 0px 0px 22px 17px;
-    -webkit-border-radius: 0px 0px 22px 17px;
     -moz-border-radius: 0px 0px 22px 17px;
+    -webkit-border-radius: 0px 0px 22px 17px;
+    
     }
 
 header .logo{
@@ -101,6 +102,7 @@ header .navbar ul li:hover > ul{
     padding: 20px 30px;
     border-top: 4px solid #333;
 }
+
 
 .form-login-index h4{
     margin: 0;
@@ -220,17 +222,22 @@ header .navbar ul li:hover > ul{
         -moz-appearance: none;
     }
 
- /* .form-login .cancel{
-    display: inline-flex;
-    justify-content: center;
-    text-align: center;
-    text-decoration: none;
-    padding: 10px;
-    background: #333;
-    color: #fff;
-    width: 50%;
-    margin: auto;
-    border-radius: 20px;
-    box-shadow: 1px 2px 6px 1px rgba(0, 0 , 0, .1);
-    transition: .2s;
- } */
+    .form-login-register{
+        width: 400px;
+        height: 320px;
+        margin: auto;
+        margin-top: 180px;
+        box-shadow: 7px 13px 37px rgba(0, 0 , 0, .1);
+        padding: 30px 30px;
+        border-top: 4px solid rgb(26, 141, 78);;
+    }
+
+    .btnregister{
+        background-color: rgb(26, 141, 78);
+        color: #fff;
+        margin: 10px 9px;
+        padding: 9px 45px;
+        -webkit-box-shadow: 2px 5px 3px -1px rgba(0,0,0,0.24);
+        -moz-box-shadow: 7px 10px 5px -1px rgba(0,0,0,0.24);
+        box-shadow: 4px 8px 5px -1px rgba(0,0,0,0.24);
+    }

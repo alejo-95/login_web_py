@@ -35,13 +35,41 @@ def login():
         if account:
             session['logueado'] = True
             session['id']= account['id']
+            session['idperfil'] = account['idperfil']
             
-            return render_template('admin.html')
+            if session['idperfil'] == 1:
+                return render_template("inde.html")
+            elif session['idperfil'] == 2:
+                return render_template('admin.html')
         
         else:
-            return render_template('index.html')
+            return render_template('index.html',mensaje='El usuario y/o la contraseña son incorrectos')
         
     
+
+@app.route('/registro')
+def registro():
+    return render_template('registro.html')
+
+
+@app.route('/create-registro', methods=["GET","POST"])
+def createRegister():
+    correo= request.form['txtCorreo']
+    password= request.form['txtPassword']
+    
+
+    
+    if correo == '':
+        return render_template('registro.html', registerWrong='Por favor ingrese un usuario valido')
+    elif password == '':
+        return render_template('registro.html', registerWrong='Por favor ingrese un usuario valido')
+    else:
+        cur = mysql.connection.cursor()
+        cur.execute("Insert into usuarios(name,password, idperfil) values(%s,%s,'2')",(correo, password))
+        mysql.connection.commit()
+        
+        
+        return render_template('index.html',mensajeRegister ='El usuario ha sido registrado con exito')
 
 
 if __name__ == '__main__':
