@@ -1,4 +1,4 @@
-*{
+* {
     margin: 0;
     box-sizing: border-box;
     padding: 0;
@@ -7,20 +7,31 @@
     text-decoration: none;
 }
 
+/* .bodyform{
+    margin-top: 10px;
+    background: url(../images/login_1.jpeg) ; 
+    background-size: cover;
+    background-color: #f3f3f3;
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+    
+} */
 
-body.index-body{
+body.index-body {
     min-height: 100vh;
     background: url(../images/inve4.png) no-repeat;
     background-size: cover;
     background-position: center;
-    
+
 }
 
-header{
+header {
     position: fixed;
-    top: 0; left: 0; right: 0;
+    top: 0;
+    left: 0;
+    right: 0;
     background: #ffffffff;
-    box-shadow: 0 5px 10 px rgba(0, 0, 0,0.1);
+    box-shadow: 0 5px 10 px rgba(0, 0, 0, 0.1);
     padding: 0px 7%;
     display: flex;
     align-items: center;
@@ -29,82 +40,82 @@ header{
     border-radius: 0px 0px 22px 17px;
     -moz-border-radius: 0px 0px 22px 17px;
     -webkit-border-radius: 0px 0px 22px 17px;
-    
-    }
 
-header .logo{
+}
+
+header .logo {
     font-weight: bolder;
     font-size: 25px;
     color: rgb(26, 141, 78);
     font-family: 'Noto Sans', sans-serif;
 }
 
-header .navbar ul{
+header .navbar ul {
     list-style: none;
     border-radius: 0px 0px 22px 17px;
     -webkit-border-radius: 0px 0px 22px 17px;
     -moz-border-radius: 0px 0px 22px 17px;
-} 
+}
 
-header .navbar ul li{
+header .navbar ul li {
     position: relative;
     float: left;
 }
 
-header .navbar ul li a{
+header .navbar ul li a {
     font-size: 20px;
     padding: 20px;
     color: #333;
     display: block;
 }
 
-header .navbar ul li a:hover{
+header .navbar ul li a:hover {
     background: rgb(26, 141, 78);
     color: #ffffffff;
     border-radius: 6px;
 }
 
-header .navbar ul li ul{
+header .navbar ul li ul {
     position: absolute;
     left: 0;
     width: 200px;
     background: #ffffffff;
     display: none;
-    
+
 }
 
-header .navbar ul li ul li{
+header .navbar ul li ul li {
     width: 100%;
-    border-top: 1px solid rgba(0, 0, 0,0.1);
-    
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+
 }
 
-header .navbar ul li ul li ul{
+header .navbar ul li ul li ul {
     left: 200px;
     top: 0;
 }
 
 header .navbar ul li:focus-within>ul,
-header .navbar ul li:hover > ul{
+header .navbar ul li:hover>ul {
     display: initial;
 }
 
-.app-title{
+.app-title {
     margin-bottom: 8px;
 }
 
-.form-login-index{
+.form-login-index {
     width: 400px;
     height: 340px;
     margin: auto;
     margin-top: 180px;
-    box-shadow: 7px 13px 37px rgba(0, 0 , 0, .1);
+    box-shadow: 7px 13px 37px rgba(0, 0, 0, .1);
     padding: 20px 30px;
     border-top: 4px solid #333;
 }
 
 
-.form-login-index h4{
+.form-login-index h4 {
     margin: 0;
     text-align: center;
     height: 40px;
@@ -113,7 +124,7 @@ header .navbar ul li:hover > ul{
     font-size: 20px;
 }
 
-.controls{
+.controls {
     width: 100%;
     border: 1px groove;
     margin-bottom: 15px;
@@ -121,7 +132,7 @@ header .navbar ul li:hover > ul{
 
 }
 
-.form-login-index .login{
+.form-login-index .login {
     display: block;
     text-align: center;
     text-decoration: none;
@@ -131,17 +142,17 @@ header .navbar ul li:hover > ul{
     width: 50%;
     margin: auto;
     border-radius: 20px;
-    box-shadow: 1px 2px 6px 1px rgba(0, 0 , 0, .1);
+    box-shadow: 1px 2px 6px 1px rgba(0, 0, 0, .1);
     transition: .2s;
- }
+}
 
-.form-login{
+.form-login {
     width: 400px;
     height: 815px;
     margin: auto;
     margin-top: 14px;
     margin-bottom: 20px;
-    box-shadow: 10px 13px 37px rgba(0, 0 , 0, .1);
+    box-shadow: 10px 13px 37px rgba(0, 0, 0, .1);
     padding: 20px 30px;
     border-top: 4px solid #333;
     border-radius: 22px 22px 22px 17px;
@@ -149,7 +160,7 @@ header .navbar ul li:hover > ul{
     -moz-border-radius: 22px 22px 22px 17px;
 }
 
-.app-form-control{
+.app-form-control {
     width: 100%;
     border: 1px groove;
     border-radius: 5px;
@@ -158,20 +169,20 @@ header .navbar ul li:hover > ul{
 
 }
 
-.app-form-select{
+.app-form-select {
     width: 100%;
     margin-bottom: 0;
     padding: 5px 0px;
     color: #7b7b7b;
 }
 
-.app-form-buttom{
+.app-form-buttom {
     width: 100%;
     padding-top: 8px;
 }
 
 
-.form-login .app-form-buttom .login{
+.form-login .app-form-buttom .login {
     position: relative;
     left: 20%;
     text-align: center;
@@ -181,12 +192,12 @@ header .navbar ul li:hover > ul{
     color: #fff;
     width: 50%;
     border-radius: 20px;
-    box-shadow: 1px 2px 6px 1px rgba(0, 0 , 0, .1);
+    box-shadow: 1px 2px 6px 1px rgba(0, 0, 0, .1);
     transition: .2s;
     font-weight: bolder;
- }
+}
 
- .form-login .app-form-buttom .cancel{
+.form-login .app-form-buttom .cancel {
     position: relative;
     left: 26%;
     text-align: center;
@@ -196,48 +207,62 @@ header .navbar ul li:hover > ul{
     color: #fff;
     width: 50%;
     border-radius: 20px;
-    box-shadow: 1px 2px 6px 1px rgba(0, 0 , 0, .1);
+    box-shadow: 1px 2px 6px 1px rgba(0, 0, 0, .1);
     transition: .2s;
     font-weight: bolder;
- }
+}
 
- .select {
+.select {
     position: relative;
     display: inline-block;
     margin-bottom: 20px;
     width: 100%;
-}    .select select {
-        font-family: 'Arial';
-        display: inline-block;
-        width: 100%;
-        cursor: pointer;
-        padding: 10px 15px;
-        outline: 0;
-        border: 0px solid #000000;
-        border-radius: 10px;
-        background: #e6e6e6;
-        color: #7b7b7b;
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-    }
+}
 
-    .form-login-register{
-        width: 400px;
-        height: 320px;
-        margin: auto;
-        margin-top: 180px;
-        box-shadow: 7px 13px 37px rgba(0, 0 , 0, .1);
-        padding: 30px 30px;
-        border-top: 4px solid rgb(26, 141, 78);;
-    }
+.select select {
+    font-family: 'Arial';
+    display: inline-block;
+    width: 100%;
+    cursor: pointer;
+    padding: 10px 15px;
+    outline: 0;
+    border: 0px solid #000000;
+    border-radius: 10px;
+    background: #e6e6e6;
+    color: #7b7b7b;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
 
-    .btnregister{
-        background-color: rgb(26, 141, 78);
-        color: #fff;
-        margin: 10px 9px;
-        padding: 9px 45px;
-        -webkit-box-shadow: 2px 5px 3px -1px rgba(0,0,0,0.24);
-        -moz-box-shadow: 7px 10px 5px -1px rgba(0,0,0,0.24);
-        box-shadow: 4px 8px 5px -1px rgba(0,0,0,0.24);
-    }
+.form-login-register {
+    width: 800px;
+    height: 320px;
+    margin: auto;
+    margin-top: 180px;
+    box-shadow: 7px 13px 37px rgba(0, 0, 0, .1);
+    padding: 30px 30px;
+    border-top: 4px solid rgb(26, 141, 78);
+    ;
+}
+
+.btnregister {
+    background-color: rgb(26, 141, 78);
+    color: #fff;
+    margin: 9px 20px;
+    padding: 9px 30px;
+    -webkit-box-shadow: 2px 5px 3px -1px rgba(0, 0, 0, 0.24);
+    -moz-box-shadow: 7px 10px 5px -1px rgba(0, 0, 0, 0.24);
+    box-shadow: 4px 8px 5px -1px rgba(0, 0, 0, 0.24);
+}
+
+
+.btnback{
+    background-color: rgb(26, 141, 78);
+    color: #fff;
+    margin: 15px 20px;
+    padding: 9px 30px;
+    -webkit-box-shadow: 2px 5px 3px -1px rgba(0, 0, 0, 0.24);
+    -moz-box-shadow: 7px 10px 5px -1px rgba(0, 0, 0, 0.24);
+    box-shadow: 4px 8px 5px -1px rgba(0, 0, 0, 0.24);
+}

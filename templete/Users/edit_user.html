@@ -12,26 +12,27 @@
 
 <body>
 
-    <div class="caja">
+    <div class="container ">
         {% if registerWrong %}
-        <div class="alert alert-danger" role="alert">
-            {{registerWrong}}
-        </div>
-        {% endif %}
-        <form action="create-registro" method="POST" class="form-control form-login-register">
-        
+            <div class="alert alert-danger" role="alert">
+                {{registerWrong}}
+            </div>
+            {% endif %}
+        <form action="/update/{{users.id}}" method="POST" class="form-control form-login-register">
+            
             <div class="form-group">
                 <label for="exampleInputEmail1">Usuario</label>
-                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
-                    placeholder="Enter email" name="txtCorreo">
+                <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                    placeholder="Usuario" name="txtCorreo" value="{{users.name}}">
             </div>
             <div class="form-group">
                 <label for="exampleInputPassword1">Contraseña</label>
-                <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password"
-                    name="txtPassword">
+                <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Contraseña"
+                    name="txtPassword" value="{{users.password}}">
             </div>
             <div class="pt-1 mb-4">
-                <button class="btn btn-default btnregister" type="submit">Ingresar</button>
+                <button class="btn btn-secondary btnregister" type="submit">Actualizar</button>
+                <a href="/listar-usuarios" class="btn btn-secondary btnback">Regresar</a>
             </div>
 
         </form>

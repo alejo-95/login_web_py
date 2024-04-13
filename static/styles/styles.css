@@ -1,0 +1,37 @@
+.title_u{
+    background-color: rgb(26, 141, 78);
+    color: white;
+}
+
+.list_user{
+    box-shadow: 7px 13px 37px rgba(0, 0, 0, .1);
+}
+
+.btn-delete{
+    color: indianred
+}
+
+.btn-edit{
+    color: cornflowerblue
+}
+
+.btnregister {
+    background-color: rgb(26, 141, 78);
+    color: #fff;
+    justify-items: left;
+    margin: 4px ;
+    padding: 9px 30px;
+    -webkit-box-shadow: 2px 5px 3px -1px rgba(0, 0, 0, 0.24);
+    -moz-box-shadow: 7px 10px 5px -1px rgba(0, 0, 0, 0.24);
+    box-shadow: 4px 8px 5px -1px rgba(0, 0, 0, 0.24);
+}
+.form-login-register {
+    width: 900px;
+    height: auto;
+    margin: auto;
+    margin-top: 80px;
+    box-shadow: 7px 13px 37px rgba(0, 0, 0, .1);
+    padding: 20px 30px;
+    border-top: 4px solid rgb(26, 141, 78);
+    ;
+}
