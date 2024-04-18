@@ -15,8 +15,8 @@ $(document).ready(function () {
         columnDefs: [
             { targets: '_all', className: 'text-center' } // Centra las columnas asignadas
         ],
-        "aLengthMenu": [[3, 5, 10, 25, -1], [3, 5, 10, 25, "Todo"]],
-        "iDisplayLength": 3,
+        "aLengthMenu": [[5, 10, 25, -1], [5, 10, 25, "Todo"]],
+        "iDisplayLength": 5,
         "language": {
             "lengthMenu": "Mostrar _MENU_ datos por página",
             "zeroRecords": "No se encuentran datos - lo sentimos",

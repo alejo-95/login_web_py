@@ -36,10 +36,10 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    z-index: 1000;
-    border-radius: 0px 0px 22px 17px;
+    z-index: 1000; 
     -moz-border-radius: 0px 0px 22px 17px;
     -webkit-border-radius: 0px 0px 22px 17px;
+    border-radius: 0px 0px 22px 17px;
 
 }
 
@@ -52,9 +52,9 @@ header .logo {
 
 header .navbar ul {
     list-style: none;
-    border-radius: 0px 0px 22px 17px;
     -webkit-border-radius: 0px 0px 22px 17px;
     -moz-border-radius: 0px 0px 22px 17px;
+    border-radius: 0px 0px 22px 17px;
 }
 
 header .navbar ul li {
@@ -155,9 +155,9 @@ header .navbar ul li:hover>ul {
     box-shadow: 10px 13px 37px rgba(0, 0, 0, .1);
     padding: 20px 30px;
     border-top: 4px solid #333;
-    border-radius: 22px 22px 22px 17px;
     -webkit-border-radius: 22px 22px 22px 17px;
     -moz-border-radius: 22px 22px 22px 17px;
+    border-radius: 22px 22px 22px 17px;
 }
 
 .app-form-control {
@@ -230,9 +230,9 @@ header .navbar ul li:hover>ul {
     border-radius: 10px;
     background: #e6e6e6;
     color: #7b7b7b;
-    appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
+    appearance: none;
 }
 
 .form-login-register {

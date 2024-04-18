@@ -35,3 +35,21 @@
     border-top: 4px solid rgb(26, 141, 78);
     ;
 }
+
+.table_u {
+    background-color: rgb(26, 141, 78);
+    color: white;
+}
+
+.div_ {
+    box-shadow: 7px 13px 37px rgba(0, 0, 0, .1);
+
+}
+
+#example th {
+    color: white;
+}
+
+.title_module{
+    color: #333333;
+}
