@@ -666,11 +666,89 @@ def addClient():
             return redirect(url_for('ListClient'))
 
 
+#Metodos para dispositivos
+#listar
+@app.route('/listar-dispositivos')
+def ListDispo():
+    cur=mysql.connection.cursor()
+    
+    cur.execute(""" select 
+                d.iddispositivo, d.nombre, ac.accesorios, ar.arduino,
+                Case when d.estado = 0 then 'Habilitado' When d.estado = 1 then 'Deshabilitado' 
+                End as status
+                from dispositivos d
+                inner join arduinos ar on ar.idarduinos = d.idarduino
+                inner join accesorios ac on ac.idaccesorios = d.idaccesorio""")
+    data = cur.fetchall()
+    
+    cur.execute('SELECT idarduinos, arduino FROM arduinos ')
+    dataOpt = cur.fetchall()
+    cur.execute('SELECT idaccesorios, accesorios FROM accesorios ')
+    dataOpt2 = cur.fetchall()
+    
+    cur.close()
+    return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt= dataOpt, dataOpt2= dataOpt2)
+#Agregar
+@app.route('/add-dispo', methods=["POST","GET"])
+def addDispo():
+    #print(request.form)
+    disp = request.form['txtDispo']
+    acce= request.form['accesorio']
+    ardui= request.form['arduino']
+    state = request.form['state']
+    #print(nam1)
+    if disp == '' or acce == "" or ardui == '' or state == '':
+        flash('Por favor ingrese un dispositivo valido', 'danger')
+        return redirect(url_for('ListDispo'))
+    else:
 
-
-
-
-
+        try:
+            cur = mysql.connection.cursor()
+            cur.execute("INSERT INTO dispositivos (nombre, idaccesorio,idarduino,estado)values(%s,%s,%s,%s)",(disp,acce,ardui,state))
+            mysql.connection.commit()
+            cur.close()
+            flash('Dispositivo agregado con exito', 'success')
+            return redirect(url_for('ListDispo'))
+        except Exception as e:
+            flash('Error al agregar el dispositivo: {}'.format(str(e)), 'danger')
+            return redirect(url_for('ListDispo'))
+#Actualizar
+@app.route('/updateDispo/<id>', methods=['POST'])
+def updateDispo(id):
+    print(request.form)
+    if request.method == 'POST':
+        disp = request.form['txtDispo']
+        acce= request.form['accesorio']
+        ardui= request.form['arduino']
+        state = request.form['state']
+        
+        if disp == '' or acce == "" or ardui == '' or state == '':
+            flash('Por favor ingrese un dispositivo valido', 'danger')
+            return redirect(url_for('ListDispo'))
+        else:
+            cur=mysql.connection.cursor()
+            cur.execute("""
+                UPDATE dispositivos
+                SET nombre = %s,
+                    idaccesorio = %s,
+                    idarduino = %s,
+                    estado = %s
+                WHERE iddispositivo= %s
+            """, (disp,acce,ardui,state,  id))
+        mysql.connection.commit()
+        cur.close()
+        flash('Dispositivo actualizado exitosamente', 'success')
+        return redirect(url_for('ListDispo'))
+#Elimnar
+@app.route('/deleteDispo/<string:id>', methods = ['POST','GET'])
+def deleteDispo(id): 
+    cur=mysql.connection.cursor()
+    
+    cur.execute('DELETE FROM dispositivos WHERE iddispositivo = {0}'.format(id))
+    mysql.connection.commit()
+    cur.close()
+    flash('Dispositivo eliminado exitosamente', 'success')
+    return redirect(url_for('ListDispo'))
 
 
 

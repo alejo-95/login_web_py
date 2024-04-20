@@ -19,42 +19,59 @@
     <script src="https://cdn.datatables.net/2.0.3/js/dataTables.bootstrap5.js"></script>
     <script src="../../static/script.js"></script>
 
-    <script src="https://cdn.datatables.net/buttons/3.0.2/js/dataTables.buttons.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.print.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables-buttons/3.0.2/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 
-    <title>Document</title>
+    <title>Termocultiva</title>
 </head>
 
 <body accesskey="">
     
-    <div id="perfilModal" class="modal fade" role="dialog" data-bs-backdrop="static">
+    <div id="userModal" class="modal fade" role="dialog" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
 
                 <div class="modal-header">
                     <h5 class="modal-title text-primary" style="align-content: center;">
-                        Por favor cree un nuevo arduino
+                        Por favor cree un nuevo dispositivo
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" title="exit">
                     </button>
                 </div>
 
 
-                <form action="/add-ard" method="POST">
+                <form action="/add-dispo" method="POST">
                     <div class="modal-body" class="form-control form-login-register">
 
                         <div class="form-group mb-3 modalForm">
-                            <label for="exampleInputEmail1">Arduino</label>
-                            <input type="text" class="form-control" id="usertxt" aria-describedby="emailHelp"
-                                placeholder="Ingrese el arduino" name="txtArd" value="">
+                            <label for="exampleInputEmail1">Nombre</label>
+                            <input type="text" class="form-control" id="usertxt12" aria-describedby="emailHelp"
+                                placeholder="Ingrese el nombre" name="txtDispo" value="">
+                        </div>
+                        <div class="form-group mb-4 modalForm">
+                            <label for="exampleInputPassword1">Accesorios</label>
+                            <select name="accesorio" class="form-control" title="option">
+                                    <option value="">Seleccionar...</option>
+                                {% for opcion in dataOpt2 %}
+                                    <option value="{{ opcion.idaccesorios }}">{{ opcion.accesorios }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group mb-4 modalForm">
+                            <label for="exampleInputPassword1">Arduino</label>
+                            <select name="arduino" class="form-control" title="option">
+                                    <option value="">Seleccionar...</option>
+                                {% for opcion in dataOpt %}
+                                    <option value="{{ opcion.idarduinos }}">{{ opcion.arduino }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                         <div class="form-group mb-4 modalForm">
                             <label for="exampleInputPassword1">Estado</label>
-                            <input type="text" class="form-control" id="passwordtxt" placeholder="Estado"
-                                name="txtEstado" value="">
+                            <select name="state" class="form-control" title="option2">
+                                    <option value="0">Habilitado</option>
+                                    <option value="1">Deshabilitado</option>
+                            </select>
                         </div>
+                        
                         <div class="modal-footer">
                             <button class="btn btn-outline-danger" data-bs-dismiss="modal" type="reset">Cancelar</button>
                             <button class="btn btn-outline-success" type="submit">Guardar</button>
@@ -72,19 +89,19 @@
 
         <div>
             <h3 class="text-center title_module">
-                Gestión arduinos
+                Gestión Dispositivos
             </h3>
         </div>
 
         <div>
             <button class="btn btn-outline-success" data-bs-toggle="modal"
-                    data-bs-target="#perfilModal"> Nuevo arduino</button>
+                    data-bs-target="#userModal"> Nuevo dispositivo</button>
         </div>
 
-        {%with messages = get_flashed_messages()%}
+        {%with messages = get_flashed_messages(with_categories=true)%}
         {%if messages%}
-        {% for message in messages %}
-        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close">
             </button>
             {{message}}
@@ -98,47 +115,69 @@
             <thead>
                 <tr class="table_u ">
                     <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Accesorio</th>
                     <th>Arduino</th>
                     <th>Estado</th>
                     <th>Acción</th>
                 </tr>
             </thead>
             <tbody>
-                {% for data in ard %}
+                {% for data in dispo %}
                 <tr>
-                    <td>{{data.idarduinos}}</th>
+                    <td>{{data.iddispositivo}}</th>
+                    <td>{{data.nombre}}</td>
+                    <td>{{data.accesorios}}</td>
                     <td>{{data.arduino}}</td>
-                    <td>{{data.estado}}</td>
+                    <td>{{data.status}}</td>
                     <td class="text-center">
-                        <a href="/updateArd/{{data.idarduinos}}" class="bi-pencil-fill edit_action" title="edit"
-                            data-bs-toggle="modal" data-bs-target="#editModal{{data.idarduinos}}"></a>
-                        <a href="/deleteArd/{{data.idarduinos}}" class="bi-eraser-fill btn-delete" title="delete"></a>
+                        <a href="/updateDispo/{{data.iddispositivo}}" class="bi-pencil-fill edit_action" title="edit"
+                            data-bs-toggle="modal" data-bs-target="#edit{{data.iddispositivo}}"></a>
+                        <a href="/deleteDispo/{{data.iddispositivo}}" class="bi-eraser-fill btn-delete" title="delete"></a>
                     </td>
                 </tr>
 
                 <!-- Edicion -->
-                <div class="modal fade" id="editModal{{data.idarduinos}}" data-bs-backdrop="static" role="dialog">
+                <div class="modal fade" id="edit{{data.iddispositivo}}" data-bs-backdrop="static" role="dialog">
                     <div class="modal-dialog modal-dialog-scrollable">
 
                         <div class="modal-content">
 
                             <div class="modal-header">
-                                <h5>Editar Arduino</h5>
+                                <h5>Editar Cliente</h5>
                                 <button class="btn-close" data-bs-dismiss="modal" title="exit"></button>
                             </div>
-                            <form action="/updateArd/{{data.idarduinos}}" method="POST">
+                            <form action="/updateDispo/{{data.iddispositivo}}" method="POST">
                                 <div class="modal-body" class="form-control form-login-register">
-
                                     <div class="form-group mb-3 modalForm">
-                                        <label for="exampleInputEmail1">Arduino</label>
-                                        <input type="text" class="form-control" id="exampleInputEmail1"
-                                            aria-describedby="emailHelp" placeholder="Ingrese Arduino" name="txtArd"
-                                            value="{{data.arduino}}">
+                                        <label for="exampleInputEmail1">Nombre</label>
+                                        <input type="text" class="form-control" id="usertxt1" aria-describedby="emailHelp"
+                                            placeholder="Ingrese el nombre" name="txtDispo" value="{{data.nombre}}">
+                                    </div>
+                                    <div class="form-group mb-4 modalForm">
+                                        <label for="exampleInputPassword1">Accesorio</label>
+                                        <select name="accesorio" class="form-control" title="option">
+                                                <option value="">Seleccionar...</option>
+                                            {% for opcion in dataOpt2 %}
+                                                <option value="{{ opcion.idaccesorios }}">{{ opcion.accesorios }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group mb-4 modalForm">
+                                        <label for="exampleInputPassword1">Arduino</label>
+                                        <select name="arduino" class="form-control" title="option">
+                                                <option value="">Seleccionar...</option>
+                                            {% for opcion in dataOpt %}
+                                                <option value="{{ opcion.idarduinos }}">{{ opcion.arduino }}</option>
+                                            {% endfor %}
+                                        </select>
                                     </div>
                                     <div class="form-group mb-4 modalForm">
                                         <label for="exampleInputPassword1">Estado</label>
-                                        <input type="text" class="form-control" id="exampleInputPassword1"
-                                            placeholder="Password" name="txtEstado" value="{{data.estado}}">
+                                        <select name="state" class="form-control" title="option2">
+                                                <option value="0">Habilitado</option>
+                                                <option value="1">Deshabilitado</option>
+                                        </select>
                                     </div>
                                     <div class="modal-footer">
                                         <button class="btn btn-outline-danger" data-bs-dismiss="modal" type="button">Cancelar</button>

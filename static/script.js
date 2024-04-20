@@ -15,6 +15,11 @@ $(document).ready(function () {
         columnDefs: [
             { targets: '_all', className: 'text-center' } // Centra las columnas asignadas
         ],
+        // layout: {
+        //     topStart: {
+        //         buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+        //     }
+        // },
         "aLengthMenu": [[5, 10, 25, -1], [5, 10, 25, "Todo"]],
         "iDisplayLength": 5,
         "language": {
