@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.3/css/dataTables.bootstrap5.css">
+    <link rel="stylesheet" href="../../static/styles/styles.css">
+
+
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.0.3/js/dataTables.bootstrap5.js"></script>
+    <script src="../../static/script.js"></script>
+
+
+    <title>Document</title>
+</head>
+
+<body accesskey="">
+    
+    <div id="userModal" class="modal fade" role="dialog" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title text-primary" style="align-content: center;">
+                        Por favor cree un nuevo cliente
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" title="exit">
+                    </button>
+                </div>
+
+
+                <form action="/add-clientes" method="POST">
+                    <div class="modal-body" class="form-control form-login-register">
+
+                        <div class="form-group mb-3 modalForm">
+                            <label for="exampleInputEmail1">Primer Nombre</label>
+                            <input type="text" class="form-control" id="usertxt12" aria-describedby="emailHelp"
+                                placeholder="Ingrese el primer nombre" name="txtName1" value="">
+                        </div>
+                        <div class="form-group mb-3 modalForm">
+                            <label for="exampleInputEmail1">Segundo Nombre</label>
+                            <input type="text" class="form-control" id="usertxt22" aria-describedby="emailHelp"
+                                placeholder="Ingrese el segundo nombre" name="txtName2" value="">
+                        </div>
+                        <div class="form-group mb-3 modalForm">
+                            <label for="exampleInputEmail1">Primer Apellido</label>
+                            <input type="text" class="form-control" id="usertxt32" aria-describedby="emailHelp"
+                                placeholder="Ingrese el primer apellido" name="txtAp1" value="">
+                        </div>
+                        <div class="form-group mb-3 modalForm">
+                            <label for="exampleInputEmail1">Segundo Apellido</label>
+                            <input type="text" class="form-control" id="usertxt42" aria-describedby="emailHelp"
+                                placeholder="Ingrese el segundo apellido" name="txtAp2" value="">
+                        </div>
+                        <div class="form-group mb-3 modalForm">
+                            <label for="exampleInputEmail1">Cedula</label>
+                            <input type="text" class="form-control" id="usertxt52" aria-describedby="emailHelp"
+                                placeholder="Ingrese su cédula" name="txtCc" value="">
+                        </div>
+                        <div class="form-group mb-3 modalForm">
+                            <label for="exampleInputEmail1">Telefono</label>
+                            <input type="text" class="form-control" id="usertxt62" aria-describedby="emailHelp"
+                                placeholder="Ingrese su telefono" name="txtTel" value="">
+                        </div>
+                        <div class="form-group mb-4 modalForm">
+                            <label for="exampleInputPassword1">Correo</label>
+                            <input type="email" class="form-control" id="passwordtxt2" placeholder="Ingrese el correo"
+                                name="txtMail" value="">
+                        </div>
+                        <div class="form-group mb-4 modalForm">
+                            <label for="exampleInputPassword1">Tipo persona</label>
+                            <select name="tipoPersona" class="form-control" title="option">
+                                    <option value="">Seleccionar...</option>
+                                {% for opcion in dataOpt %}
+                                    <option value="{{ opcion.idtipo_clientes }}">{{ opcion.tipo }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group mb-4 modalForm">
+                            <label for="exampleInputPassword1">Estado</label>
+                            <select name="state" class="form-control" title="option2">
+                                    <option value="0">Habilitado</option>
+                                    <option value="1">Deshabilitado</option>
+                            </select>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button class="btn btn-outline-danger" data-bs-dismiss="modal" type="reset">Cancelar</button>
+                            <button class="btn btn-outline-success" type="submit">Guardar</button>
+                        </div>
+
+                    </div>
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="container  pt-5 ">
+
+        <div>
+            <h3 class="text-center title_module">
+                Gestión Clientes
+            </h3>
+        </div>
+
+        <div>
+            <button class="btn btn-outline-success" data-bs-toggle="modal"
+                    data-bs-target="#userModal"> Nuevo cliente</button>
+        </div>
+
+        {%with messages = get_flashed_messages(with_categories=true)%}
+        {%if messages%}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close">
+            </button>
+            {{message}}
+        </div>
+        {%endfor%}
+        {%endif%}
+        {%endwith%}
+
+        
+        <table id="example" class="table table-striped div_">
+            <thead>
+                <tr class="table_u ">
+                    <th>ID</th>
+                    <th>Primer nombre</th>
+                    <th>segundo nombre</th>
+                    <th>Primer apellido</th>
+                    <th>segundo apellido</th>
+                    <th>Cedula</th>
+                    <th>Telefono</th>
+                    <th>Correo</th>
+                    <th>Tipo</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in client %}
+                <tr>
+                    <td>{{data.idclientes}}</th>
+                    <td>{{data.nombre_1}}</td>
+                    <td>{{data.nombre_2}}</td>
+                    <td>{{data.apellido_1}}</td>
+                    <td>{{data.apellido_2}}</td>
+                    <td>{{data.cedula}}</td>
+                    <td>{{data.telefono}}</td>
+                    <td>{{data.correo}}</td>
+                    <td>{{data.tipo}}</td>
+                    <td>{{data.status}}</td>
+                    <td class="text-center">
+                        <a href="/updateCliente/{{data.idclientes}}" class="bi-pencil-fill edit_action" title="edit"
+                            data-bs-toggle="modal" data-bs-target="#edit{{data.idclientes}}"></a>
+                        <a href="/deleteCliente/{{data.idclientes}}" class="bi-eraser-fill btn-delete" title="delete"></a>
+                    </td>
+                </tr>
+
+                <!-- Edicion -->
+                <div class="modal fade" id="edit{{data.idclientes}}" data-bs-backdrop="static" role="dialog">
+                    <div class="modal-dialog modal-dialog-scrollable">
+
+                        <div class="modal-content">
+
+                            <div class="modal-header">
+                                <h5>Editar Cliente</h5>
+                                <button class="btn-close" data-bs-dismiss="modal" title="exit"></button>
+                            </div>
+                            <form action="/updateCliente/{{data.idclientes}}" method="POST">
+                                <div class="modal-body" class="form-control form-login-register">
+                                    <div class="form-group mb-3 modalForm">
+                                        <label for="exampleInputEmail1">Primer Nombre</label>
+                                        <input type="text" class="form-control" id="usertxt1" aria-describedby="emailHelp"
+                                            placeholder="Ingrese el primer nombre" name="txtName1" value="{{data.nombre_1}}">
+                                    </div>
+                                    <div class="form-group mb-3 modalForm">
+                                        <label for="exampleInputEmail1">Segundo Nombre</label>
+                                        <input type="text" class="form-control" id="usertxt2" aria-describedby="emailHelp"
+                                            placeholder="Ingrese el segundo nombre" name="txtName2" value="{{data.nombre_2}}">
+                                    </div>
+                                    <div class="form-group mb-3 modalForm">
+                                        <label for="exampleInputEmail1">Primer Apellido</label>
+                                        <input type="text" class="form-control" id="usertxt3" aria-describedby="emailHelp"
+                                            placeholder="Ingrese el primer apellido" name="txtAp1" value="{{data.apellido_1}}">
+                                    </div>
+                                    <div class="form-group mb-3 modalForm">
+                                        <label for="exampleInputEmail1">Segundo Apellido</label>
+                                        <input type="text" class="form-control" id="usertxt4" aria-describedby="emailHelp"
+                                            placeholder="Ingrese el segundo apellido" name="txtAp2" value="{{data.apellido_2}}">
+                                    </div>
+                                    <div class="form-group mb-3 modalForm">
+                                        <label for="exampleInputEmail1">Cedula</label>
+                                        <input type="text" class="form-control" id="usertxt5" aria-describedby="emailHelp"
+                                            placeholder="Ingrese su cédula" name="txtCc" value="{{data.cedula}}">
+                                    </div>
+                                    <div class="form-group mb-3 modalForm">
+                                        <label for="exampleInputEmail1">Telefono</label>
+                                        <input type="text" class="form-control" id="usertxt6" aria-describedby="emailHelp"
+                                            placeholder="Ingrese su telefono" name="txtTel" value="{{data.telefono}}">
+                                    </div>
+                                    <div class="form-group mb-4 modalForm">
+                                        <label for="exampleInputPassword1">Correo</label>
+                                        <input type="email" class="form-control" id="passwordtxt" placeholder="Ingrese el correo"
+                                            name="txtMail" value="{{data.correo}}">
+                                    </div>
+                                    <div class="form-group mb-4 modalForm">
+                                        <label for="exampleInputPassword1">Tipo persona</label>
+                                        <select name="tipoPersona" class="form-control" title="option">
+                                                <option value="">Seleccionar...</option>
+                                            {% for opcion in dataOpt %}
+                                                <option value="{{ opcion.idtipo_clientes }}">{{ opcion.tipo }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group mb-4 modalForm">
+                                        <label for="exampleInputPassword1">Estado</label>
+                                        <select name="state" class="form-control" title="option2">
+                                                <option value="">Seleccionar...</option>
+                                                <option value="0">Habilitado</option>
+                                                <option value="1">Deshabilitado</option>
+                                        </select>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-outline-danger" data-bs-dismiss="modal" type="button">Cancelar</button>
+                                        <button class="btn btn-outline-primary" type="submit">Actualizar</button>
+                                    </div>
+
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="pt-1 mb-4">
+            <a href="/admin" class="btn btn-outline-secondary btnback">Regresar</a>
+        </div>
+
+    </div>
+
+    <script>
+        const btnDelete = document.querySelectorAll('.btn-delete');
+        if (btnDelete) {
+            const btnArray = Array.from(btnDelete);
+            btnArray.forEach((btn) => {
+                btn.addEventListener('click', (e) => {
+                    if (!confirm('Esta seguro que desea eliminar el registro?')) {
+                        e.preventDefault();
+                    }
+                });
+            })
+        }
+    </script>
+
+</body>
+
+</html>

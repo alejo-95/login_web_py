@@ -20,45 +20,46 @@
     <script src="../../static/script.js"></script>
 
 
-    <title>Document</title>
+    <title>Termocultiva</title>
 </head>
 
 <body accesskey="">
     
-    <div id="userModal" class="modal fade" role="dialog" data-bs-backdrop="static">
+    <div id="perfilModal" class="modal fade" role="dialog" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
 
                 <div class="modal-header">
                     <h5 class="modal-title text-primary" style="align-content: center;">
-                        Por favor cree un nuevo usuario
+                        Por favor cree un nuevo cultivo
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" title="exit">
                     </button>
                 </div>
 
 
-                <form action="/add-user" method="POST">
+                <form action="/add-cult" method="POST">
                     <div class="modal-body" class="form-control form-login-register">
 
                         <div class="form-group mb-3 modalForm">
-                            <label for="exampleInputEmail1">Usuario</label>
-                            <input type="text" class="form-control" id="usertxt" aria-describedby="emailHelp"
-                                placeholder="Enter email" name="txtCorreo" value="">
+                            <label for="exampleInputEmail1">Cultivo</label>
+                            <input type="text" class="form-control" id="cultivo1" aria-describedby="emailHelp"
+                                placeholder="Ingrese el cultivo" name="txtCulti" value="">
+                        </div>
+                        <div class="form-group mb-3 modalForm">
+                            <label for="exampleInputEmail1">Temperatura minima</label>
+                            <input type="text" class="form-control" id="temp_min1" aria-describedby="emailHelp"
+                                placeholder="Ingrese la temperatura minima" name="txtTempMin" value="">
+                        </div>
+                        <div class="form-group mb-3 modalForm">
+                            <label for="exampleInputEmail1">Temperatura maxima</label>
+                            <input type="text" class="form-control" id="temp_max1" aria-describedby="emailHelp"
+                                placeholder="Ingrese la temperatura maxima" name="txtTempMax" value="">
                         </div>
                         <div class="form-group mb-4 modalForm">
-                            <label for="exampleInputPassword1">Contraseña</label>
-                            <input type="password" class="form-control" id="passwordtxt" placeholder="Password"
-                                name="txtPassword" value="">
-                        </div>
-                        <div class="form-group mb-4 modalForm">
-                            <label for="exampleInputPassword1">Perfil</label>
-                            <select name="perfil" class="form-control" title="option">
-                                    <option value="">Seleccionar...</option>
-                                {% for opcion in dataOpt %}
-                                    <option value="{{ opcion.idperfiles }}">{{ opcion.perfiles }}</option>
-                                {% endfor %}
-                            </select>
+                            <label for="exampleInputPassword1">Estado</label>
+                            <input type="text" class="form-control" id="passwordtxt1" placeholder="Estado"
+                                name="txtEstado" value="">
                         </div>
                         <div class="modal-footer">
                             <button class="btn btn-outline-danger" data-bs-dismiss="modal" type="reset">Cancelar</button>
@@ -77,13 +78,13 @@
 
         <div>
             <h3 class="text-center title_module">
-                Gestión usuarios
+                Gestión Cultivos
             </h3>
         </div>
 
         <div>
             <button class="btn btn-outline-success" data-bs-toggle="modal"
-                    data-bs-target="#userModal"> Nuevo usuario</button>
+                    data-bs-target="#perfilModal"> Nuevo Cultivo</button>
         </div>
 
         {%with messages = get_flashed_messages(with_categories=true)%}
@@ -103,50 +104,60 @@
             <thead>
                 <tr class="table_u ">
                     <th>ID</th>
-                    <th>Usuario</th>
-                    <th>Contraseña</th>
-                    <th>Perfil</th>
+                    <th>Cultivo</th>
+                    <th>Temeperatura minima</th>
+                    <th>Temeperatura maxima</th>
+                    <th>Estado</th>
                     <th>Acción</th>
                 </tr>
             </thead>
             <tbody>
-                {% for data in users %}
+                {% for data in temp %}
                 <tr>
-                    <td>{{data.id}}</th>
-                    <td>{{data.name}}</td>
-                    <td>{{data.password}}</td>
-                    <td>{{data.perfiles}}</td>
+                    <td>{{data.idcultivos}}</th>
+                    <td>{{data.cultivo}}</td>
+                    <td>{{data.temp_min}}</td>
+                    <td>{{data.temp_max}}</td>
+                    <td>{{data.status}}</td>
                     <td class="text-center">
-                        <a href="/update/{{data.id}}" class="bi-pencil-fill edit_action" title="edit"
-                            data-bs-toggle="modal" data-bs-target="#edit{{data.id}}"></a>
-                        <a href="/delete/{{data.id}}" class="bi-eraser-fill btn-delete" title="delete"></a>
+                        <a href="/updateCultivo/{{data.idcultivos}}" class="bi-pencil-fill edit_action" title="edit"
+                            data-bs-toggle="modal" data-bs-target="#editModal{{data.idcultivos}}"></a>
+                        <a href="/deleteCultivo/{{data.idcultivos}}" class="bi-eraser-fill btn-delete" title="delete"></a>
                     </td>
                 </tr>
 
                 <!-- Edicion -->
-                <div class="modal fade" id="edit{{data.id}}" data-bs-backdrop="static" role="dialog">
+                <div class="modal fade" id="editModal{{data.idcultivos}}" data-bs-backdrop="static" role="dialog">
                     <div class="modal-dialog modal-dialog-scrollable">
 
                         <div class="modal-content">
 
                             <div class="modal-header">
-                                <h5>Editar Usuario</h5>
+                                <h5>Editar tamaño de invernadero</h5>
                                 <button class="btn-close" data-bs-dismiss="modal" title="exit"></button>
                             </div>
-                            <form action="/update/{{data.id}}" method="POST">
+                            <form action="/updateCultivo/{{data.idcultivos}}" method="POST">
                                 <div class="modal-body" class="form-control form-login-register">
-
                                     <div class="form-group mb-3 modalForm">
-                                        <label for="exampleInputEmail1">Usuario</label>
-                                        <input type="text" class="form-control" id="exampleInputEmail1"
-                                            aria-describedby="emailHelp" placeholder="Enter email" name="txtCorreo"
-                                            value="{{data.name}}">
+                                        <label for="exampleInputEmail1">Cultivo</label>
+                                        <input type="text" class="form-control" id="cultivo" aria-describedby="emailHelp"
+                                            placeholder="Ingrese el tamaño" name="txtCulti" value="{{data.cultivo}}">
                                     </div>
-                                    <div class="form-group mb-4 modalForm">
-                                        <label for="exampleInputPassword1">Contraseña</label>
-                                        <input type="password" class="form-control" id="exampleInputPassword1"
-                                            placeholder="Password" name="txtPassword" value="{{data.password}}">
+                                    <div class="form-group mb-3 modalForm">
+                                        <label for="exampleInputEmail1">Temperatura minima</label>
+                                        <input type="text" class="form-control" id="temp_min" aria-describedby="emailHelp"
+                                            placeholder="Ingrese el tamaño" name="txtTempMin" value="{{data.temp_min}}">
                                     </div>
+                                    <div class="form-group mb-3 modalForm">
+                                        <label for="exampleInputEmail1">Temperatura maxima</label>
+                                        <input type="text" class="form-control" id="temp_max" aria-describedby="emailHelp"
+                                            placeholder="Ingrese el tamaño" name="txtTempMax" value="{{data.temp_max}}">
+                                    </div>
+                                    <!-- <div class="form-group mb-4 modalForm">
+                                        <label for="exampleInputPassword1">Estado</label>
+                                        <input type="text" class="form-control" id="passwordtxt" placeholder="Estado"
+                                            name="txtEstado" value="{{data.status}}">
+                                    </div> -->
                                     <div class="modal-footer">
                                         <button class="btn btn-outline-danger" data-bs-dismiss="modal" type="button">Cancelar</button>
                                         <button class="btn btn-outline-primary" type="submit">Actualizar</button>
