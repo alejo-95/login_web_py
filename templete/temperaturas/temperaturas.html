@@ -31,27 +31,25 @@
 
                 <div class="modal-header">
                     <h5 class="modal-title text-primary" style="align-content: center;">
-                        Por favor cree un nuevo perfil
+                        Por favor cree un nuevo tamaño de invernadero
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" title="exit">
                     </button>
                 </div>
 
 
-                <form action="/add-perfiles" method="POST">
+                <form action="/add-tam" method="POST">
                     <div class="modal-body" class="form-control form-login-register">
 
                         <div class="form-group mb-3 modalForm">
-                            <label for="exampleInputEmail1">Perfil</label>
+                            <label for="exampleInputEmail1">Tamaño de invernadero</label>
                             <input type="text" class="form-control" id="usertxt" aria-describedby="emailHelp"
-                                placeholder="Ingrese el perfil" name="txtPerfil" value="">
+                                placeholder="Ingrese el tamaño" name="txtTam" value="">
                         </div>
                         <div class="form-group mb-4 modalForm">
                             <label for="exampleInputPassword1">Estado</label>
-                            <select name="state" class="form-control" title="option2">
-                                    <option value="0">Habilitado</option>
-                                    <option value="1">Deshabilitado</option>
-                            </select>
+                            <input type="text" class="form-control" id="passwordtxt" placeholder="Estado"
+                                name="txtEstado" value="">
                         </div>
                         <div class="modal-footer">
                             <button class="btn btn-outline-danger" data-bs-dismiss="modal" type="reset">Cancelar</button>
@@ -70,14 +68,14 @@
 
         <div>
             <h3 class="text-center title_module">
-                Gestión perfiles
+                Gestión Temperaturas
             </h3>
         </div>
 
-        <div>
+        <!-- <div>
             <button class="btn btn-outline-success" data-bs-toggle="modal"
-                    data-bs-target="#perfilModal"> Nuevo perfil</button>
-        </div>
+                    data-bs-target="#perfilModal"> Nuevo tamaño de invernadero</button>
+        </div> -->
 
         {%with messages = get_flashed_messages(with_categories=true)%}
         {%if messages%}
@@ -92,53 +90,55 @@
         {%endwith%}
 
         
-        <table id="example" class="table table-striped div_">
+        <table id="example" class="table table-striped  div_">
             <thead>
                 <tr class="table_u ">
                     <th>ID</th>
-                    <th>Perfil</th>
+                    <th>Temperatura</th>
+                    <th>Fecha</th>
                     <th>Estado</th>
-                    <th>Acción</th>
+                    <th>Dispositivo</th>
+                    <!-- <th>Acción</th> -->
                 </tr>
             </thead>
             <tbody>
-                {% for data in perfil %}
+                {% for data in temp %}
                 <tr>
-                    <td>{{data.idperfiles}}</th>
-                    <td>{{data.perfiles}}</td>
+                    <td>{{data.iddatos_temperaturas}}</th>
+                    <td>{{data.datos_temperaturas}}</td>
+                    <td>{{data.fecha_temperatura}}</td>
+                    <td>{{data.nombre}}</td>
                     <td>{{data.status}}</td>
-                    <td class="text-center">
-                        <a href="/updatePerfil/{{data.idperfiles}}" class="bi-pencil-fill edit_action" title="edit"
-                            data-bs-toggle="modal" data-bs-target="#editModal{{data.perfiles}}"></a>
-                        <a href="/deletePerfil/{{data.idperfiles}}" class="bi-eraser-fill btn-delete" title="delete"></a>
-                    </td>
+                    <!-- <td class="text-center">
+                        <a href="/updateTamanio/{{data.idtamanios}}" class="bi-pencil-fill edit_action" title="edit"
+                            data-bs-toggle="modal" data-bs-target="#editModal{{data.idtamanios}}"></a>
+                        <a href="/deleteTamanio/{{data.idtamanios}}" class="bi-eraser-fill btn-delete" title="delete"></a>
+                    </td> -->
                 </tr>
 
                 <!-- Edicion -->
-                <div class="modal fade" id="editModal{{data.perfiles}}" data-bs-backdrop="static" role="dialog">
+                <div class="modal fade" id="editModal{{data.idtamanios}}" data-bs-backdrop="static" role="dialog">
                     <div class="modal-dialog modal-dialog-scrollable">
 
                         <div class="modal-content">
 
                             <div class="modal-header">
-                                <h5>Editar Perfil</h5>
+                                <h5>Editar tamaño de invernadero</h5>
                                 <button class="btn-close" data-bs-dismiss="modal" title="exit"></button>
                             </div>
-                            <form action="/updatePerfil/{{data.idperfiles}}" method="POST">
+                            <form action="/updateTamanio/{{data.idtamanios}}" method="POST">
                                 <div class="modal-body" class="form-control form-login-register">
 
                                     <div class="form-group mb-3 modalForm">
-                                        <label for="exampleInputEmail1">Perfil</label>
+                                        <label for="exampleInputEmail1">Tamaño de invernadero</label>
                                         <input type="text" class="form-control" id="exampleInputEmail1"
-                                            aria-describedby="emailHelp" placeholder="Enter email" name="txtPerfil"
-                                            value="{{data.perfiles}}">
+                                            aria-describedby="emailHelp" placeholder="Ingrese el tamaño" name="txtTam"
+                                            value="{{data.tamanio}}">
                                     </div>
                                     <div class="form-group mb-4 modalForm">
                                         <label for="exampleInputPassword1">Estado</label>
-                                        <select name="state" class="form-control" title="option2">
-                                                <option value="0">Habilitado</option>
-                                                <option value="1">Deshabilitado</option>
-                                        </select>
+                                        <input type="text" class="form-control" id="exampleInputPassword1"
+                                            placeholder="Estado" name="txtEstado" value="{{data.estado}}">
                                     </div>
                                     <div class="modal-footer">
                                         <button class="btn btn-outline-danger" data-bs-dismiss="modal" type="button">Cancelar</button>

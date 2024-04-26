@@ -48,8 +48,10 @@
                         </div>
                         <div class="form-group mb-4 modalForm">
                             <label for="exampleInputPassword1">Estado</label>
-                            <input type="text" class="form-control" id="passwordtxt" placeholder="Estado"
-                                name="txtEstado" value="">
+                            <select name="state" class="form-control" title="option2">
+                                    <option value="0">Habilitado</option>
+                                    <option value="1">Deshabilitado</option>
+                            </select>
                         </div>
                         <div class="modal-footer">
                             <button class="btn btn-outline-danger" data-bs-dismiss="modal" type="reset">Cancelar</button>
@@ -104,7 +106,7 @@
                 <tr>
                     <td>{{data.idtipo_clientes}}</th>
                     <td>{{data.tipo}}</td>
-                    <td>{{data.estado}}</td>
+                    <td>{{data.status}}</td>
                     <td class="text-center">
                         <a href="/updateTipClient/{{data.idtipo_clientes}}" class="bi-pencil-fill edit_action" title="edit"
                             data-bs-toggle="modal" data-bs-target="#editModal{{data.idtipo_clientes}}"></a>
@@ -133,8 +135,10 @@
                                     </div>
                                     <div class="form-group mb-4 modalForm">
                                         <label for="exampleInputPassword1">Estado</label>
-                                        <input type="text" class="form-control" id="exampleInputPassword1"
-                                            placeholder="Password" name="txtEstado" value="{{data.estado}}">
+                                        <select name="state" class="form-control" title="option2">
+                                                <option value="0">Habilitado</option>
+                                                <option value="1">Deshabilitado</option>
+                                        </select>
                                     </div>
                                     <div class="modal-footer">
                                         <button class="btn btn-outline-danger" data-bs-dismiss="modal" type="button">Cancelar</button>

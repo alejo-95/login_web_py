@@ -24,7 +24,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables-buttons/3.0.2/js/dataTables.buttons.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 
-    <title>Document</title>
+    <title>Termocultiva</title>
 </head>
 
 <body accesskey="">
@@ -52,8 +52,10 @@
                         </div>
                         <div class="form-group mb-4 modalForm">
                             <label for="exampleInputPassword1">Estado</label>
-                            <input type="text" class="form-control" id="passwordtxt" placeholder="Estado"
-                                name="txtEstado" value="">
+                            <select name="state" class="form-control" title="option2">
+                                    <option value="0">Habilitado</option>
+                                    <option value="1">Deshabilitado</option>
+                            </select>
                         </div>
                         <div class="modal-footer">
                             <button class="btn btn-outline-danger" data-bs-dismiss="modal" type="reset">Cancelar</button>
@@ -81,10 +83,10 @@
                     data-bs-target="#perfilModal"> Nuevo arduino</button>
         </div>
 
-        {%with messages = get_flashed_messages()%}
+        {%with messages = get_flashed_messages(with_categories=true)%}
         {%if messages%}
-        {% for message in messages %}
-        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close">
             </button>
             {{message}}
@@ -108,7 +110,7 @@
                 <tr>
                     <td>{{data.idarduinos}}</th>
                     <td>{{data.arduino}}</td>
-                    <td>{{data.estado}}</td>
+                    <td>{{data.status}}</td>
                     <td class="text-center">
                         <a href="/updateArd/{{data.idarduinos}}" class="bi-pencil-fill edit_action" title="edit"
                             data-bs-toggle="modal" data-bs-target="#editModal{{data.idarduinos}}"></a>
@@ -137,8 +139,10 @@
                                     </div>
                                     <div class="form-group mb-4 modalForm">
                                         <label for="exampleInputPassword1">Estado</label>
-                                        <input type="text" class="form-control" id="exampleInputPassword1"
-                                            placeholder="Password" name="txtEstado" value="{{data.estado}}">
+                                        <select name="state" class="form-control" title="option2">
+                                                <option value="0">Habilitado</option>
+                                                <option value="1">Deshabilitado</option>
+                                        </select>
                                     </div>
                                     <div class="modal-footer">
                                         <button class="btn btn-outline-danger" data-bs-dismiss="modal" type="button">Cancelar</button>
