@@ -25,44 +25,26 @@
 
 <body accesskey="">
     
-    <div id="userModal" class="modal fade" role="dialog" data-bs-backdrop="static">
+    <div id="perfilModal" class="modal fade" role="dialog" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h5 class="modal-title text-primary new_title"">
-                        Por favor cree un nuevo dispositivo
+                    <h5 class="modal-title text-primary new_title">
+                        Por favor cree un nuevo tipo de invernadero
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" title="exit">
                     </button>
                 </div>
 
 
-                <form action="/add-dispo" method="POST">
+                <form action="/add-tipInv" method="POST">
                     <div class="modal-body" class="form-control form-login-register">
 
                         <div class="form-group mb-3 modalForm">
-                            <label for="exampleInputEmail1">Nombre</label>
-                            <input type="text" class="form-control" id="usertxt12" aria-describedby="emailHelp"
-                                placeholder="Ingrese el nombre" name="txtDispo" value="">
-                        </div>
-                        <div class="form-group mb-4 modalForm">
-                            <label for="exampleInputPassword1">Accesorios</label>
-                            <select name="accesorio" class="form-control" title="option">
-                                    <option value="">Seleccionar...</option>
-                                {% for opcion in dataOpt2 %}
-                                    <option value="{{ opcion.idaccesorios }}">{{ opcion.accesorios }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="form-group mb-4 modalForm">
-                            <label for="exampleInputPassword1">Arduino</label>
-                            <select name="arduino" class="form-control" title="option">
-                                    <option value="">Seleccionar...</option>
-                                {% for opcion in dataOpt %}
-                                    <option value="{{ opcion.idarduinos }}">{{ opcion.arduino }}</option>
-                                {% endfor %}
-                            </select>
+                            <label for="exampleInputEmail1">Tipo de invernadero</label>
+                            <input type="text" class="form-control" id="usertxt" aria-describedby="emailHelp"
+                                placeholder="Ingrese el tipo invernadero" name="txtTip" value="">
                         </div>
                         <div class="form-group mb-4 modalForm">
                             <label for="exampleInputPassword1">Estado</label>
@@ -71,7 +53,6 @@
                                     <option value="1">Deshabilitado</option>
                             </select>
                         </div>
-                        
                         <div class="modal-footer">
                             <button class="btn btn-outline-danger" data-bs-dismiss="modal" type="reset">Cancelar</button>
                             <button class="btn btn-outline-success" type="submit">Guardar</button>
@@ -89,13 +70,13 @@
 
         <div>
             <h3 class="text-center title_module">
-                Gestión Dispositivos
+                Gestión tipo invernadero
             </h3>
         </div>
 
         <div>
             <button class="btn btn-outline-success" data-bs-toggle="modal"
-                    data-bs-target="#userModal"> Nuevo dispositivo</button>
+                    data-bs-target="#perfilModal"> Nuevo tipo invernadero</button>
         </div>
 
         {%with messages = get_flashed_messages(with_categories=true)%}
@@ -115,62 +96,42 @@
             <thead>
                 <tr class="table_u ">
                     <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Accesorio</th>
-                    <th>Arduino</th>
+                    <th>Tipo Cliente</th>
                     <th>Estado</th>
                     <th>Acción</th>
                 </tr>
             </thead>
             <tbody>
-                {% for data in dispo %}
+                {% for data in tip %}
                 <tr>
-                    <td>{{data.iddispositivo}}</th>
-                    <td>{{data.nombre}}</td>
-                    <td>{{data.accesorios}}</td>
-                    <td>{{data.arduino}}</td>
+                    <td>{{data.idtipo_invernadero}}</th>
+                    <td>{{data.tipo_invernadero}}</td>
                     <td>{{data.status}}</td>
                     <td class="text-center">
-                        <a href="/updateDispo/{{data.iddispositivo}}" class="bi-pencil-fill edit_action" title="edit"
-                            data-bs-toggle="modal" data-bs-target="#edit{{data.iddispositivo}}"></a>
-                        <a href="/deleteDispo/{{data.iddispositivo}}" class="bi-eraser-fill btn-delete" title="delete"></a>
+                        <a href="/updateTipInv/{{data.idtipo_invernadero}}" class="bi-pencil-fill edit_action" title="edit"
+                            data-bs-toggle="modal" data-bs-target="#editModal{{data.idtipo_invernadero}}"></a>
+                        <a href="/deleteTipInv/{{data.idtipo_invernadero}}" class="bi-eraser-fill btn-delete" title="delete"></a>
                     </td>
                 </tr>
 
                 <!-- Edicion -->
-                <div class="modal fade" id="edit{{data.iddispositivo}}" data-bs-backdrop="static" role="dialog">
+                <div class="modal fade" id="editModal{{data.idtipo_invernadero}}" data-bs-backdrop="static" role="dialog">
                     <div class="modal-dialog modal-dialog-scrollable">
 
                         <div class="modal-content">
 
                             <div class="modal-header">
-                                <h5>Editar Cliente</h5>
+                                <h5>Editar Tipo Invernadero</h5>
                                 <button class="btn-close" data-bs-dismiss="modal" title="exit"></button>
                             </div>
-                            <form action="/updateDispo/{{data.iddispositivo}}" method="POST">
+                            <form action="/updateTipInv/{{data.idtipo_invernadero}}" method="POST">
                                 <div class="modal-body" class="form-control form-login-register">
+
                                     <div class="form-group mb-3 modalForm">
-                                        <label for="exampleInputEmail1">Nombre</label>
-                                        <input type="text" class="form-control" id="usertxt1" aria-describedby="emailHelp"
-                                            placeholder="Ingrese el nombre" name="txtDispo" value="{{data.nombre}}">
-                                    </div>
-                                    <div class="form-group mb-4 modalForm">
-                                        <label for="exampleInputPassword1">Accesorio</label>
-                                        <select name="accesorio" class="form-control" title="option">
-                                                <option value="">Seleccionar...</option>
-                                            {% for opcion in dataOpt2 %}
-                                                <option value="{{ opcion.idaccesorios }}">{{ opcion.accesorios }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    <div class="form-group mb-4 modalForm">
-                                        <label for="exampleInputPassword1">Arduino</label>
-                                        <select name="arduino" class="form-control" title="option">
-                                                <option value="">Seleccionar...</option>
-                                            {% for opcion in dataOpt %}
-                                                <option value="{{ opcion.idarduinos }}">{{ opcion.arduino }}</option>
-                                            {% endfor %}
-                                        </select>
+                                        <label for="exampleInputEmail1">Tipo Cliente</label>
+                                        <input type="text" class="form-control" id="exampleInputEmail1"
+                                            aria-describedby="emailHelp" placeholder="Ingrese tipo de invernadero" name="txtTip"
+                                            value="{{data.tipo_invernadero}}">
                                     </div>
                                     <div class="form-group mb-4 modalForm">
                                         <label for="exampleInputPassword1">Estado</label>

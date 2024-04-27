@@ -1192,6 +1192,256 @@ def deleteDispo(id):
         flash('Por favor ingrese un * valido', 'danger')
         return redirect(url_for('*'))
 
+
+#Metodos para tipo_cliente
+#Listar
+@app.route('/listar-tipInve')
+def ListTipInve():
+    cur=mysql.connection.cursor()
+
+    cur.execute("""SELECT idtipo_invernadero, tipo_invernadero,
+                    Case when estado = 0 then 'Habilitado' When estado = 1 then 'Deshabilitado' 
+                    End as status
+                    FROM tipo_invernadero""")
+    data = cur.fetchall()
+
+    cur.close()
+    return render_template('invernaderos/list_tipoInvernadero.html', tip = data)
+#Agregar
+@app.route('/add-tipInv', methods=["POST","GET"])
+def addTipInve():
+    tip = request.form['txtTip']
+    state = request.form['state']
+    
+    cur = mysql.connection.cursor()
+    cur.execute('Select tipo_invernadero from tipo_invernadero where tipo_invernadero = %s',(tip,))
+    busquedaCC = cur.fetchone()
+    cur.close()
+    
+    if not validar_espacios(tip):
+        flash('Por favor ingrese un tipo de invernadero valido', 'danger')
+        return redirect(url_for('ListTipInve'))
+    
+    if  busquedaCC: 
+        flash(f'El tipo de invernadero {tip} ya se encuentra creado', 'danger')
+        return redirect(url_for('ListTipInve')) 
+    else:
+
+        try:
+            cur = mysql.connection.cursor()
+            cur.execute("INSERT INTO tipo_invernadero (tipo_invernadero, estado) VALUES (%s, %s)", (tip, state))
+            mysql.connection.commit()
+            flash('Tipo de invernadero agregado con exito', 'success')
+            return redirect(url_for('ListTipInve'))
+        except Exception as e:
+
+            return 
+#Eliminar
+@app.route('/deleteTipInv/<string:id>', methods = ['POST','GET'])
+def deleteTipInv(id): 
+    cur=mysql.connection.cursor()
+    
+    try:
+        cur.execute('DELETE FROM tipo_invernadero WHERE idtipo_invernadero = {0}'.format(id))
+        mysql.connection.commit()
+        flash('Tipo de invernadero eliminado exitosamente')
+        return redirect(url_for('ListTipInve'))
+    except Exception  as e:
+        if '1451' in str(e):
+            flash('No se puede eliminar el tipo de invernadero porque está relacionado con otros registros.', 'danger')
+        else:
+            flash('Error al eliminar el tipo de invernadero: {}'.format(str(e)), 'danger')
+    finally:
+        cur.close()
+    return redirect(url_for('ListTipInve'))
+#Actualizar
+@app.route('/updateTipInv/<id>', methods=['POST'])
+def updateTipInv(id):
+    if request.method == 'POST':
+        tip = request.form['txtTip']
+        state = request.form['state']
+        
+        cur = mysql.connection.cursor()
+        cur.execute('Select tipo_invernadero from tipo_invernadero where tipo_invernadero = %s',(tip,))
+        busquedaCC = cur.fetchone()
+        cur.execute('Select tipo_invernadero from tipo_invernadero where idtipo_invernadero = %s',(id,))
+        repe = cur.fetchone()
+        cur.close()
+    
+        if not validar_espacios(tip):
+            flash('Por favor ingrese un tipo de invernadero valido','danger')
+            return redirect(url_for('ListTipInve'))
+        
+        if  tip == '':
+            flash('Por favor ingrese un tipo de invernadero valido','danger')
+            return redirect(url_for('ListTipInve'))
+        
+        if busquedaCC:
+            if repe['tipo_invernadero'] == tip:
+                flash('Tipo de invernadero sin cambios detectados', 'success')
+                return redirect(url_for('ListTipInve'))
+            elif busquedaCC['tipo']:
+                flash(f'El tipo de invernadero {tip} ya se encuentra creado', 'danger')
+                return redirect(url_for('ListTipInve'))      
+        else:
+            cur=mysql.connection.cursor()
+            cur.execute("""
+                UPDATE tipo_invernadero
+                SET tipo_invernadero = %s,
+                    estado = %s
+                WHERE idtipo_invernadero= %s
+            """, (tip, state,  id))
+        mysql.connection.commit()
+        flash('Tipo invernadero actualizado exitosamente','success')
+        return redirect(url_for('ListTipInve'))
+
+
+#Metodos para invernaderos
+#listar
+@app.route('/listar-invernaderos')
+def ListInverna():
+    cur=mysql.connection.cursor()
+    
+    cur.execute(""" SELECT idinvernaderos, nombre_invernadero, c.cultivo, ti.tamanio,
+                    d.nombre, c2.cedula, ti2.tipo_invernadero,
+                    Case when i.estado = 0 then 'Habilitado' When i.estado = 1 then 'Deshabilitado'
+                                End as status
+                from invernaderos i
+                inner join cultivos c on i.idCultivo = c.idcultivos
+                inner join clientes c2 on i.idcliente = c2.idClientes
+                inner join dispositivos d on i.iddispositivo = d.iddispositivo
+                inner join tamanios_invernadero ti on i.idtamanio = ti.idtamanios
+                inner join tipo_invernadero ti2 on i.tipo_invernadero = ti2.idtipo_invernadero""")
+    data = cur.fetchall()
+    
+    cur.execute('SELECT idcultivos, cultivo FROM cultivos ')
+    dataOpt = cur.fetchall()
+    cur.execute('SELECT idclientes, cedula FROM clientes ')
+    dataOpt2 = cur.fetchall()
+    cur.execute('SELECT iddispositivo, nombre FROM dispositivos ')
+    dataOpt3 = cur.fetchall()
+    cur.execute('SELECT idtamanios, tamanio FROM tamanios_invernadero ')
+    dataOpt4 = cur.fetchall()
+    cur.execute('SELECT idtipo_invernadero, tipo_invernadero FROM tipo_invernadero ')
+    dataOpt5 = cur.fetchall()
+    
+    cur.close()
+    return render_template('invernaderos/list_invernaderos.html', dispo = data, dataOpt= dataOpt, dataOpt2= dataOpt2,
+                        dataOpt3 = dataOpt3, dataOpt4=dataOpt4, dataOpt5=dataOpt5)
+#Agregar
+@app.route('/add-inverna', methods=["POST","GET"])
+def addInverna():
+    #print(request.form)
+    inve = request.form['txtInve']
+    cc= request.form['cedula']
+    cult= request.form['cultivo']
+    dispo = request.form['Dispositivo']
+    tip = request.form['tipo']
+    tam = request.form['tamanio']
+    state = request.form['state']
+    #print(nam1)
+    cur = mysql.connection.cursor()
+    cur.execute('Select * from invernaderos where nombre_invernadero = %s',(inve,))
+    busquedaCC = cur.fetchone()
+    cur.close()
+    
+    if cc =='' or cult =='' or dispo =='' or tip =='' or tam=='' or state =='':
+        flash('Por favor ingrese un invernadero valido', 'danger')
+        return redirect(url_for('ListInverna'))
+    
+    if not validar_espacios(inve):
+        flash('Por favor ingrese un invernadero valido', 'danger')
+        return redirect(url_for('ListInverna'))
+    
+    if  busquedaCC: 
+        flash(f'El invernadero {inve} ya se encuentra creado', 'danger')
+        return redirect(url_for('ListInverna')) 
+    else:
+        try:
+            cur = mysql.connection.cursor()
+            cur.execute("INSERT INTO invernaderos (nombre_invernadero, idCultivo, idtamanio, iddispositivo, idcliente, tipo_invernadero, estado)values(%s,%s,%s,%s,%s,%s,%s)",
+                        (inve,cult,tam,dispo,cc,tip,state))
+            mysql.connection.commit()
+            cur.close()
+            flash('Invernadero agregado con exito', 'success')
+            return redirect(url_for('ListInverna'))
+        except Exception as e:
+            flash('Error al agregar el dispositivo: {}'.format(str(e)), 'danger')
+            return redirect(url_for('ListInverna'))
+#Actualizar
+@app.route('/updateInverna/<id>', methods=['POST'])
+def updateInverna(id):
+    #print(request.form)
+    if request.method == 'POST':
+        inve = request.form['txtInve']
+        cc= request.form['cedula']
+        cult= request.form['cultivo']
+        dispo = request.form['Dispositivo']
+        tip = request.form['tipo']
+        tam = request.form['tamanio']
+        state = request.form['state']
+        
+        cur = mysql.connection.cursor()
+        cur.execute("""select *  from invernaderos WHERE idinvernaderos = %s""", (id,))
+        repe = cur.fetchone()
+        
+        
+        if cc =='' or cult =='' or dispo =='' or tip =='' or tam=='' or state =='':
+            flash('Por favor ingrese un invernadero valido', 'danger')
+            return redirect(url_for('ListInverna'))
+        
+        if not validar_espacios(inve):
+            flash('Por favor ingrese un invernadero valido', 'danger')
+            return redirect(url_for('ListInverna'))
+        
+        if repe['nombre_invernadero'] != inve:
+            cur = mysql.connection.cursor()
+            cur.execute('SELECT * FROM invernaderos WHERE nombre_invernadero = %s', (inve,))
+            existe = cur.fetchone()
+            cur.close()
+            
+            if existe:
+                flash(f'El invernadero {inve} ya se encuentra creado', 'danger')
+                return redirect(url_for('ListInverna'))
+
+        cur=mysql.connection.cursor()
+        cur.execute("""
+            UPDATE invernadero
+            SET nombre_invernadero = %s,
+                idCultivo = %s,
+                idtamanio = %s,
+                iddispositivo = %s,
+                idcliente = %s,
+                tipo_invernadero = %s,
+                estado = %s
+            WHERE idinvernaderos= %s
+        """, (inve,cult,tam,dispo,cc,tip,state,  id))
+        mysql.connection.commit()
+        cur.close()
+        flash('Invernadero actualizado exitosamente', 'success')
+        return redirect(url_for('ListDispo'))
+
+#Elimnar
+@app.route('/deleteInverna/<string:id>', methods = ['POST','GET'])
+def deleteInverna(id): 
+    cur=mysql.connection.cursor()
+    try:
+        cur=mysql.connection.cursor()
+        cur.execute('DELETE FROM invernaderos WHERE idinvernaderos = {0}'.format(id))
+        mysql.connection.commit()
+        cur.close()
+        flash('Invernadero eliminado exitosamente', 'success')
+        return redirect(url_for('ListInverna'))
+    except Exception  as e:
+        if '1451' in str(e):
+            flash('No se puede eliminar el invernadero porque está relacionado con otros registros.', 'danger')
+        else:
+            flash('Error al eliminar el dispositivo: {}'.format(str(e)), 'danger')
+    finally:
+        cur.close()
+    return redirect(url_for('ListInverna'))
+
+
 #Metodo para temperatura
 #listar
 @app.route('/listar-temp')

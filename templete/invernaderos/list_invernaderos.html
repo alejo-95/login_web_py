@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.3/css/dataTables.bootstrap5.css">
+    <link rel="stylesheet" href="../../static/styles/styles.css">
+
+
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.0.3/js/dataTables.bootstrap5.js"></script>
+    <script src="../../static/script.js"></script>
+
+
+    <title>Termocultiva</title>
+</head>
+
+<body accesskey="">
+
+    <div id="userModal" class="modal fade" role="dialog" data-bs-backdrop="static">
+        <div class="modal-dialog ">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title text-primary new_title">
+                        Por favor cree un nuevo invernadero
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" title="exit">
+                    </button>
+                </div>
+
+
+                <form action="/add-inverna" method="POST">
+                    <div class="modal-body" class="form-control form-login-register">
+
+                        <div class="form-group mb-3 modalForm">
+                            <label for="exampleInputEmail1">Nombre</label>
+                            <input type="text" class="form-control" id="usertxt1" aria-describedby="emailHelp"
+                                placeholder="Ingrese el nombre del invernadero" name="txtInve" value="">
+                        </div>
+                        <div class="form-group mb-4 modalForm">
+                            <label for="exampleInputPassword1">Cliente</label>
+                            <select name="cedula" class="form-control" title="option">
+                                <option value="">Seleccionar...</option>
+                                {% for opcion in dataOpt2 %}
+                                <option value="{{ opcion.idclientes }}">{{ opcion.cedula }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group mb-4 modalForm">
+                            <label for="exampleInputPassword1">Cultivo</label>
+                            <select name="cultivo" class="form-control" title="option">
+                                <option value="">Seleccionar...</option>
+                                {% for opcion in dataOpt %}
+                                <option value="{{ opcion.idcultivos }}">{{ opcion.cultivo }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group mb-4 modalForm">
+                            <label for="exampleInputPassword1">Dispositivo</label>
+                            <select name="Dispositivo" class="form-control" title="option">
+                                <option value="">Seleccionar...</option>
+                                {% for opcion in dataOpt3 %}
+                                <option value="{{ opcion.iddispositivo }}">{{ opcion.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group mb-4 modalForm">
+                            <label for="exampleInputPassword1">Tipo invernadero</label>
+                            <select name="tipo" class="form-control" title="option">
+                                <option value="">Seleccionar...</option>
+                                {% for opcion in dataOpt5 %}
+                                <option value="{{ opcion.idtipo_invernadero }}">{{ opcion.tipo_invernadero }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group mb-4 modalForm">
+                            <label for="exampleInputPassword1">Tamaño en metros</label>
+                            <select name="tamanio" class="form-control" title="option">
+                                <option value="">Seleccionar...</option>
+                                {% for opcion in dataOpt4 %}
+                                <option value="{{ opcion.idtamanios }}">{{ opcion.tamanio }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group mb-4 modalForm">
+                            <label for="exampleInputPassword1">Estado</label>
+                            <select name="state" class="form-control" title="option2">
+                                <option value="0">Habilitado</option>
+                                <option value="1">Deshabilitado</option>
+                            </select>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button class="btn btn-outline-danger" data-bs-dismiss="modal"
+                                type="reset">Cancelar</button>
+                            <button class="btn btn-outline-success" type="submit">Guardar</button>
+                        </div>
+
+                    </div>
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="container  pt-5 ">
+
+        <div>
+            <h3 class="text-center title_module">
+                Gestión Invernadero
+            </h3>
+        </div>
+
+        <div>
+            <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#userModal"> Nuevo
+                invernadero</button>
+        </div>
+
+        {%with messages = get_flashed_messages(with_categories=true)%}
+        {%if messages%}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close">
+            </button>
+            {{message}}
+        </div>
+        {%endfor%}
+        {%endif%}
+        {%endwith%}
+
+
+        <table id="example" class="table table-striped div_">
+            <thead>
+                <tr class="table_u ">
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Cultivo</th>
+                    <th>Tamaño en metros</th>
+                    <th>Dispositivo</th>
+                    <th>Cédula</th>
+                    <th>Tipo inveradero</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in dispo %}
+                <tr>
+                    <td>{{data.idinvernaderos}}</th>
+                    <td>{{data.nombre_invernadero}}</td>
+                    <td>{{data.cultivo}}</td>
+                    <td>{{data.tamanio}}</td>
+                    <td>{{data.nombre}}</td>
+                    <td>{{data.cedula}}</td>
+                    <td>{{data.tipo_invernadero}}</td>
+                    <td>{{data.status}}</td>
+                    <td class="text-center">
+                        <a href="/updateInverna/{{data.idinvernaderos}}" class="bi-pencil-fill edit_action" title="edit"
+                            data-bs-toggle="modal" data-bs-target="#edit{{data.idinvernaderos}}"></a>
+                        <a href="/deleteInverna/{{data.idinvernaderos}}" class="bi-eraser-fill btn-delete"
+                            title="delete"></a>
+                    </td>
+                </tr>
+
+                <!-- Edicion -->
+                <div class="modal fade" id="edit{{data.idinvernaderos}}" data-bs-backdrop="static" role="dialog">
+                    <div class="modal-dialog modal-dialog-scrollable">
+
+                        <div class="modal-content">
+
+                            <div class="modal-header">
+                                <h5>Editar Invernadero</h5>
+                                <button class="btn-close" data-bs-dismiss="modal" title="exit"></button>
+                            </div>
+                            <form action="/updateInverna/{{data.idinvernaderos}}" method="POST">
+                                <div class="modal-body" class="form-control form-login-register">
+                                    <div class="form-group mb-3 modalForm">
+                                        <label for="exampleInputEmail1">Nombre</label>
+                                        <input type="text" class="form-control" id="usertxt12"
+                                            aria-describedby="emailHelp" placeholder="Ingrese el nombre del invernadero"
+                                            name="txtInve" value="{{data.nombre_invernadero}}">
+                                    </div>
+                                    <div class="form-group mb-4 modalForm">
+                                        <label for="exampleInputPassword1">Cliente</label>
+                                        <select name="cedula" class="form-control" title="option">
+                                            <option value="">Seleccionar...</option>
+                                            {% for opcion in dataOpt2 %}
+                                            <option value="{{ opcion.idclientes }}">{{ opcion.cedula }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group mb-4 modalForm">
+                                        <label for="exampleInputPassword1">Cultivo</label>
+                                        <select name="cultivo" class="form-control" title="option">
+                                            <option value="">Seleccionar...</option>
+                                            {% for opcion in dataOpt %}
+                                            <option value="{{ opcion.idcultivos }}">{{ opcion.cultivo }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group mb-4 modalForm">
+                                        <label for="exampleInputPassword1">Dispositivo</label>
+                                        <select name="Dispositivo" class="form-control" title="option">
+                                            <option value="">Seleccionar...</option>
+                                            {% for opcion in dataOpt3 %}
+                                            <option value="{{ opcion.iddispositivo }}">{{ opcion.nombre }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group mb-4 modalForm">
+                                        <label for="exampleInputPassword1">Tipo invernadero</label>
+                                        <select name="tipo" class="form-control" title="option">
+                                            <option value="">Seleccionar...</option>
+                                            {% for opcion in dataOpt5 %}
+                                            <option value="{{ opcion.idtipo_invernadero }}">{{ opcion.tipo_invernadero
+                                                }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group mb-4 modalForm">
+                                        <label for="exampleInputPassword1">Tamaño en metros</label>
+                                        <select name="tamanio" class="form-control" title="option">
+                                            <option value="">Seleccionar...</option>
+                                            {% for opcion in dataOpt4 %}
+                                            <option value="{{ opcion.idtamanios }}">{{ opcion.tamanio }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group mb-4 modalForm">
+                                        <label for="exampleInputPassword1">Estado</label>
+                                        <select name="state" class="form-control" title="option2">
+                                            <option value="0">Habilitado</option>
+                                            <option value="1">Deshabilitado</option>
+                                        </select>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-outline-danger" data-bs-dismiss="modal"
+                                            type="button">Cancelar</button>
+                                        <button class="btn btn-outline-primary" type="submit">Actualizar</button>
+                                    </div>
+
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="pt-1 mb-4">
+            <a href="/admin" class="btn btn-outline-secondary btnback">Regresar</a>
+        </div>
+
+    </div>
+
+    <script>
+        const btnDelete = document.querySelectorAll('.btn-delete');
+        if (btnDelete) {
+            const btnArray = Array.from(btnDelete);
+            btnArray.forEach((btn) => {
+                btn.addEventListener('click', (e) => {
+                    if (!confirm('Esta seguro que desea eliminar el registro?')) {
+                        e.preventDefault();
+                    }
+                });
+            })
+        }
+    </script>
+
+</body>
+
+</html>
