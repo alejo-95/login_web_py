@@ -40,11 +40,26 @@
 
                 <form action="/add-inverna" method="POST">
                     <div class="modal-body" class="form-control form-login-register">
-
+                        {%with messages = get_flashed_messages(with_categories=true)%}
+                        {%if messages and dupliErr%}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}
+                        </div>
+                        {%endfor%}
+                        {%endif%}
+                        {%endwith%}
                         <div class="form-group mb-3 modalForm">
                             <label for="exampleInputEmail1">Nombre</label>
                             <input type="text" class="form-control" id="usertxt1" aria-describedby="emailHelp"
-                                placeholder="Ingrese el nombre del invernadero" name="txtInve" value="">
+                                placeholder="Ingrese el nombre del invernadero" name="txtInve" value="{{inve}}">
+                            {%with messages = get_flashed_messages(with_categories=true)%}
+                            {%if messages and inveErr%}
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
+                                {{message}}</div>
+                            {%endfor%}
+                            {%endif%}
+                            {%endwith%}
                         </div>
                         <div class="form-group mb-4 modalForm">
                             <label for="exampleInputPassword1">Cliente</label>
@@ -54,6 +69,14 @@
                                 <option value="{{ opcion.idclientes }}">{{ opcion.cedula }}</option>
                                 {% endfor %}
                             </select>
+                            {%with messages = get_flashed_messages(with_categories=true)%}
+                            {%if messages and ccErr%}
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
+                                {{message}}</div>
+                            {%endfor%}
+                            {%endif%}
+                            {%endwith%}
                         </div>
                         <div class="form-group mb-4 modalForm">
                             <label for="exampleInputPassword1">Cultivo</label>
@@ -63,6 +86,14 @@
                                 <option value="{{ opcion.idcultivos }}">{{ opcion.cultivo }}</option>
                                 {% endfor %}
                             </select>
+                            {%with messages = get_flashed_messages(with_categories=true)%}
+                            {%if messages and cultErr%}
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
+                                {{message}}</div>
+                            {%endfor%}
+                            {%endif%}
+                            {%endwith%}
                         </div>
                         <div class="form-group mb-4 modalForm">
                             <label for="exampleInputPassword1">Dispositivo</label>
@@ -72,6 +103,14 @@
                                 <option value="{{ opcion.iddispositivo }}">{{ opcion.nombre }}</option>
                                 {% endfor %}
                             </select>
+                            {%with messages = get_flashed_messages(with_categories=true)%}
+                            {%if messages and dispoErr%}
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
+                                {{message}}</div>
+                            {%endfor%}
+                            {%endif%}
+                            {%endwith%}
                         </div>
                         <div class="form-group mb-4 modalForm">
                             <label for="exampleInputPassword1">Tipo invernadero</label>
@@ -81,6 +120,14 @@
                                 <option value="{{ opcion.idtipo_invernadero }}">{{ opcion.tipo_invernadero }}</option>
                                 {% endfor %}
                             </select>
+                            {%with messages = get_flashed_messages(with_categories=true)%}
+                            {%if messages and tipErr%}
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
+                                {{message}}</div>
+                            {%endfor%}
+                            {%endif%}
+                            {%endwith%}
                         </div>
                         <div class="form-group mb-4 modalForm">
                             <label for="exampleInputPassword1">Tamaño en metros</label>
@@ -90,6 +137,14 @@
                                 <option value="{{ opcion.idtamanios }}">{{ opcion.tamanio }}</option>
                                 {% endfor %}
                             </select>
+                            {%with messages = get_flashed_messages(with_categories=true)%}
+                            {%if messages and tamErr%}
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
+                                {{message}}</div>
+                            {%endfor%}
+                            {%endif%}
+                            {%endwith%}
                         </div>
                         <div class="form-group mb-4 modalForm">
                             <label for="exampleInputPassword1">Estado</label>
@@ -126,17 +181,18 @@
                 invernadero</button>
         </div>
 
-        {%with messages = get_flashed_messages(with_categories=true)%}
-        {%if messages%}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
         {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close">
-            </button>
-            {{message}}
+        {% if category == 'success' or category == 'warning' %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
+            {{ message }}
         </div>
-        {%endfor%}
-        {%endif%}
-        {%endwith%}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
 
 
         <table id="example" class="table table-striped div_">
@@ -165,10 +221,12 @@
                     <td>{{data.tipo_invernadero}}</td>
                     <td>{{data.status}}</td>
                     <td class="text-center">
-                        <a href="/updateInverna/{{data.idinvernaderos}}" class="bi-pencil-fill edit_action" title="edit"
-                            data-bs-toggle="modal" data-bs-target="#edit{{data.idinvernaderos}}"></a>
+                        <a href="/updateInverna/{{data.idinvernaderos}}" class="bi-pencil-fill edit_action"
+                            title="editar" data-bs-toggle="modal" data-bs-target="#edit{{data.idinvernaderos}}"></a>
+                        <a href="/InhabilInverna/{{data.idinvernaderos}}" class="bi bi-ban btn-inhabi"
+                            title="Inhabilitar"></a>
                         <a href="/deleteInverna/{{data.idinvernaderos}}" class="bi-eraser-fill btn-delete"
-                            title="delete"></a>
+                            title="Eliminar"></a>
                     </td>
                 </tr>
 
@@ -184,11 +242,27 @@
                             </div>
                             <form action="/updateInverna/{{data.idinvernaderos}}" method="POST">
                                 <div class="modal-body" class="form-control form-login-register">
+                                    {%with messages = get_flashed_messages(with_categories=true)%}
+                                    {%if messages and dupliErr%}
+                                    {% for category, message in messages %}
+                                    <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
+                                        {{message}}</div>
+                                    {%endfor%}
+                                    {%endif%}
+                                    {%endwith%}
                                     <div class="form-group mb-3 modalForm">
                                         <label for="exampleInputEmail1">Nombre</label>
                                         <input type="text" class="form-control" id="usertxt12"
                                             aria-describedby="emailHelp" placeholder="Ingrese el nombre del invernadero"
                                             name="txtInve" value="{{data.nombre_invernadero}}">
+                                        {%with messages = get_flashed_messages(with_categories=true)%}
+                                        {%if messages and inveErr%}
+                                        {% for category, message in messages %}
+                                        <div class="alert alert-{{category}} alert-dismissible fade show mt-3"
+                                            role="alert">{{message}}</div>
+                                        {%endfor%}
+                                        {%endif%}
+                                        {%endwith%}
                                     </div>
                                     <div class="form-group mb-4 modalForm">
                                         <label for="exampleInputPassword1">Cliente</label>
@@ -198,6 +272,14 @@
                                             <option value="{{ opcion.idclientes }}">{{ opcion.cedula }}</option>
                                             {% endfor %}
                                         </select>
+                                        {%with messages = get_flashed_messages(with_categories=true)%}
+                                        {%if messages and ccErr%}
+                                        {% for category, message in messages %}
+                                        <div class="alert alert-{{category}} alert-dismissible fade show mt-3"
+                                            role="alert">{{message}}</div>
+                                        {%endfor%}
+                                        {%endif%}
+                                        {%endwith%}
                                     </div>
                                     <div class="form-group mb-4 modalForm">
                                         <label for="exampleInputPassword1">Cultivo</label>
@@ -207,6 +289,14 @@
                                             <option value="{{ opcion.idcultivos }}">{{ opcion.cultivo }}</option>
                                             {% endfor %}
                                         </select>
+                                        {%with messages = get_flashed_messages(with_categories=true)%}
+                                        {%if messages and cultErr%}
+                                        {% for category, message in messages %}
+                                        <div class="alert alert-{{category}} alert-dismissible fade show mt-3"
+                                            role="alert">{{message}}</div>
+                                        {%endfor%}
+                                        {%endif%}
+                                        {%endwith%}
                                     </div>
                                     <div class="form-group mb-4 modalForm">
                                         <label for="exampleInputPassword1">Dispositivo</label>
@@ -216,6 +306,14 @@
                                             <option value="{{ opcion.iddispositivo }}">{{ opcion.nombre }}</option>
                                             {% endfor %}
                                         </select>
+                                        {%with messages = get_flashed_messages(with_categories=true)%}
+                                        {%if messages and dispoErr%}
+                                        {% for category, message in messages %}
+                                        <div class="alert alert-{{category}} alert-dismissible fade show mt-3"
+                                            role="alert">{{message}}</div>
+                                        {%endfor%}
+                                        {%endif%}
+                                        {%endwith%}
                                     </div>
                                     <div class="form-group mb-4 modalForm">
                                         <label for="exampleInputPassword1">Tipo invernadero</label>
@@ -226,6 +324,14 @@
                                                 }}</option>
                                             {% endfor %}
                                         </select>
+                                        {%with messages = get_flashed_messages(with_categories=true)%}
+                                        {%if messages and tipErr%}
+                                        {% for category, message in messages %}
+                                        <div class="alert alert-{{category}} alert-dismissible fade show mt-3"
+                                            role="alert">{{message}}</div>
+                                        {%endfor%}
+                                        {%endif%}
+                                        {%endwith%}
                                     </div>
                                     <div class="form-group mb-4 modalForm">
                                         <label for="exampleInputPassword1">Tamaño en metros</label>
@@ -235,6 +341,14 @@
                                             <option value="{{ opcion.idtamanios }}">{{ opcion.tamanio }}</option>
                                             {% endfor %}
                                         </select>
+                                        {%with messages = get_flashed_messages(with_categories=true)%}
+                                        {%if messages and tamErr%}
+                                        {% for category, message in messages %}
+                                        <div class="alert alert-{{category}} alert-dismissible fade show mt-3"
+                                            role="alert">{{message}}</div>
+                                        {%endfor%}
+                                        {%endif%}
+                                        {%endwith%}
                                     </div>
                                     <div class="form-group mb-4 modalForm">
                                         <label for="exampleInputPassword1">Estado</label>
@@ -278,8 +392,33 @@
                 });
             })
         }
+        const btninhabili = document.querySelectorAll('.btn-inhabi');
+        if (btninhabili) {
+            const btnArray = Array.from(btninhabili);
+            btnArray.forEach((btn) => {
+                btn.addEventListener('click', (e) => {
+                    if (!confirm('Esta seguro que desea inhabilitar el registro?')) {
+                        e.preventDefault();
+                    }
+                });
+            })
+        }
     </script>
+    {% if add_modal %}
+    <script>
+        $(document).ready(function () {
+            $('#userModal').modal('show');
+        });
+    </script>
+    {% endif %}
 
+    {% if edit_modal %}
+    <script>
+        $(document).ready(function () {
+            $('#edit{{edit_modal}}').modal('show');
+        });
+    </script>
+    {% endif %}
 </body>
 
 </html>

@@ -24,7 +24,7 @@
 </head>
 
 <body accesskey="">
-    
+
     <div id="perfilModal" class="modal fade" role="dialog" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
@@ -40,21 +40,37 @@
 
                 <form action="/add-tipInv" method="POST">
                     <div class="modal-body" class="form-control form-login-register">
-
+                        {%with messages = get_flashed_messages(with_categories=true)%}
+                        {%if messages and dupliErr%}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}
+                        </div>
+                        {%endfor%}
+                        {%endif%}
+                        {%endwith%}
                         <div class="form-group mb-3 modalForm">
                             <label for="exampleInputEmail1">Tipo de invernadero</label>
                             <input type="text" class="form-control" id="usertxt" aria-describedby="emailHelp"
-                                placeholder="Ingrese el tipo invernadero" name="txtTip" value="">
+                                placeholder="Ingrese el tipo invernadero" name="txtTip" value="{{tipe}}">
+                            {%with messages = get_flashed_messages(with_categories=true)%}
+                            {%if messages and tipErr%}
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
+                                {{message}}</div>
+                            {%endfor%}
+                            {%endif%}
+                            {%endwith%}
                         </div>
                         <div class="form-group mb-4 modalForm">
                             <label for="exampleInputPassword1">Estado</label>
                             <select name="state" class="form-control" title="option2">
-                                    <option value="0">Habilitado</option>
-                                    <option value="1">Deshabilitado</option>
+                                <option value="0">Habilitado</option>
+                                <option value="1">Deshabilitado</option>
                             </select>
                         </div>
                         <div class="modal-footer">
-                            <button class="btn btn-outline-danger" data-bs-dismiss="modal" type="reset">Cancelar</button>
+                            <button class="btn btn-outline-danger" data-bs-dismiss="modal"
+                                type="reset">Cancelar</button>
                             <button class="btn btn-outline-success" type="submit">Guardar</button>
                         </div>
 
@@ -75,23 +91,24 @@
         </div>
 
         <div>
-            <button class="btn btn-outline-success" data-bs-toggle="modal"
-                    data-bs-target="#perfilModal"> Nuevo tipo invernadero</button>
+            <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#perfilModal"> Nuevo tipo
+                invernadero</button>
         </div>
 
-        {%with messages = get_flashed_messages(with_categories=true)%}
-        {%if messages%}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
         {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close">
-            </button>
-            {{message}}
+        {% if category == 'success' or category == 'warning' %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
+            {{ message }}
         </div>
-        {%endfor%}
-        {%endif%}
-        {%endwith%}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
 
-        
+
         <table id="example" class="table table-striped div_">
             <thead>
                 <tr class="table_u ">
@@ -108,14 +125,18 @@
                     <td>{{data.tipo_invernadero}}</td>
                     <td>{{data.status}}</td>
                     <td class="text-center">
-                        <a href="/updateTipInv/{{data.idtipo_invernadero}}" class="bi-pencil-fill edit_action" title="edit"
-                            data-bs-toggle="modal" data-bs-target="#editModal{{data.idtipo_invernadero}}"></a>
-                        <a href="/deleteTipInv/{{data.idtipo_invernadero}}" class="bi-eraser-fill btn-delete" title="delete"></a>
+                        <a href="/updateTipInv/{{data.idtipo_invernadero}}" class="bi-pencil-fill edit_action"
+                            title="edit" data-bs-toggle="modal"
+                            data-bs-target="#editModal{{data.idtipo_invernadero}}"></a>
+                        <a href="/InhabilTipInv/{{data.idtipo_invernadero}}" class="bi bi-ban btn-inhabi" title="Inhabilitar"></a>
+                        <a href="/deleteTipInv/{{data.idtipo_invernadero}}" class="bi-eraser-fill btn-delete"
+                            title="delete"></a>
                     </td>
                 </tr>
 
                 <!-- Edicion -->
-                <div class="modal fade" id="editModal{{data.idtipo_invernadero}}" data-bs-backdrop="static" role="dialog">
+                <div class="modal fade" id="editModal{{data.idtipo_invernadero}}" data-bs-backdrop="static"
+                    role="dialog">
                     <div class="modal-dialog modal-dialog-scrollable">
 
                         <div class="modal-content">
@@ -126,22 +147,40 @@
                             </div>
                             <form action="/updateTipInv/{{data.idtipo_invernadero}}" method="POST">
                                 <div class="modal-body" class="form-control form-login-register">
-
+                                    {%with messages = get_flashed_messages(with_categories=true)%}
+                                    {%if messages and dupliErr%}
+                                    {% for category, message in messages %}
+                                    <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
+                                        {{message}}
+                                    </div>
+                                    {%endfor%}
+                                    {%endif%}
+                                    {%endwith%}
                                     <div class="form-group mb-3 modalForm">
                                         <label for="exampleInputEmail1">Tipo Cliente</label>
                                         <input type="text" class="form-control" id="exampleInputEmail1"
-                                            aria-describedby="emailHelp" placeholder="Ingrese tipo de invernadero" name="txtTip"
-                                            value="{{data.tipo_invernadero}}">
+                                            aria-describedby="emailHelp" placeholder="Ingrese tipo de invernadero"
+                                            name="txtTip" value="{{data.tipo_invernadero}}">
+                                        {%with messages = get_flashed_messages(with_categories=true)%}
+                                        {%if messages and tipErr%}
+                                        {% for category, message in messages %}
+                                        <div class="alert alert-{{category}} alert-dismissible fade show mt-3"
+                                            role="alert">
+                                            {{message}}</div>
+                                        {%endfor%}
+                                        {%endif%}
+                                        {%endwith%}
                                     </div>
                                     <div class="form-group mb-4 modalForm">
                                         <label for="exampleInputPassword1">Estado</label>
                                         <select name="state" class="form-control" title="option2">
-                                                <option value="0">Habilitado</option>
-                                                <option value="1">Deshabilitado</option>
+                                            <option value="0">Habilitado</option>
+                                            <option value="1">Deshabilitado</option>
                                         </select>
                                     </div>
                                     <div class="modal-footer">
-                                        <button class="btn btn-outline-danger" data-bs-dismiss="modal" type="button">Cancelar</button>
+                                        <button class="btn btn-outline-danger" data-bs-dismiss="modal"
+                                            type="button">Cancelar</button>
                                         <button class="btn btn-outline-primary" type="submit">Actualizar</button>
                                     </div>
 
@@ -174,7 +213,33 @@
                 });
             })
         }
+        const btninhabili = document.querySelectorAll('.btn-inhabi');
+        if (btninhabili) {
+            const btnArray = Array.from(btninhabili);
+            btnArray.forEach((btn) => {
+                btn.addEventListener('click', (e) => {
+                    if (!confirm('Esta seguro que desea inhabilitar el registro?')) {
+                        e.preventDefault();
+                    }
+                });
+            })
+        }
     </script>
+    {% if add_modal %}
+    <script>
+        $(document).ready(function () {
+            $('#perfilModal').modal('show');
+        });
+    </script>
+    {% endif %}
+
+    {% if edit_modal %}
+    <script>
+        $(document).ready(function () {
+            $('#editModal{{edit_modal}}').modal('show');
+        });
+    </script>
+    {% endif %}
 
 </body>
 

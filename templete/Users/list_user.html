@@ -24,7 +24,7 @@
 </head>
 
 <body accesskey="">
-    
+
     <div id="userModal" class="modal fade" role="dialog" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
@@ -40,28 +40,60 @@
 
                 <form action="/add-user" method="POST">
                     <div class="modal-body" class="form-control form-login-register">
-
+                        {%with messages = get_flashed_messages(with_categories=true)%}
+                        {%if messages and dupliErr%}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}
+                        </div>
+                        {%endfor%}
+                        {%endif%}
+                        {%endwith%}
                         <div class="form-group mb-3 modalForm">
                             <label for="exampleInputEmail1">Usuario</label>
                             <input type="text" class="form-control" id="usertxt" aria-describedby="emailHelp"
-                                placeholder="Ingrese el usuario" name="txtCorreo" value="">
+                                placeholder="Ingrese el usuario" name="txtCorreo" value="{{correo}}">
+                            {%with messages = get_flashed_messages(with_categories=true)%}
+                            {%if messages and correoErr%}
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
+                                {{message}}</div>
+                            {%endfor%}
+                            {%endif%}
+                            {%endwith%}
                         </div>
                         <div class="form-group mb-4 modalForm">
                             <label for="exampleInputPassword1">Contraseña</label>
                             <input type="password" class="form-control" id="passwordtxt" placeholder="Contraseña"
                                 name="txtPassword" value="">
+                            {%with messages = get_flashed_messages(with_categories=true)%}
+                            {%if messages and contraErr%}
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
+                                {{message}}</div>
+                            {%endfor%}
+                            {%endif%}
+                            {%endwith%}
                         </div>
                         <div class="form-group mb-4 modalForm">
                             <label for="exampleInputPassword1">Perfil</label>
                             <select name="perfil" class="form-control" title="option">
-                                    <option value="">Seleccionar...</option>
+                                <option value="">Seleccionar...</option>
                                 {% for opcion in dataOpt %}
-                                    <option value="{{ opcion.idperfiles }}">{{ opcion.perfiles }}</option>
+                                <option value="{{ opcion.idperfiles }}">{{ opcion.perfiles }}</option>
                                 {% endfor %}
                             </select>
+                            {%with messages = get_flashed_messages(with_categories=true)%}
+                            {%if messages and perfilErr%}
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
+                                {{message}}</div>
+                            {%endfor%}
+                            {%endif%}
+                            {%endwith%}
                         </div>
                         <div class="modal-footer">
-                            <button class="btn btn-outline-danger" data-bs-dismiss="modal" type="reset">Cancelar</button>
+                            <button class="btn btn-outline-danger" data-bs-dismiss="modal"
+                                type="reset">Cancelar</button>
                             <button class="btn btn-outline-success" type="submit">Guardar</button>
                         </div>
 
@@ -82,23 +114,24 @@
         </div>
 
         <div>
-            <button class="btn btn-outline-success" data-bs-toggle="modal"
-                    data-bs-target="#userModal"> Nuevo usuario</button>
+            <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#userModal"> Nuevo
+                usuario</button>
         </div>
 
-        {%with messages = get_flashed_messages(with_categories=true)%}
-        {%if messages%}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
         {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close">
-            </button>
-            {{message}}
+        {% if category == 'success' or category == 'warning' %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
+            {{ message }}
         </div>
-        {%endfor%}
-        {%endif%}
-        {%endwith%}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
 
-        
+
         <table id="example" class="table table-striped div_">
             <thead>
                 <tr class="table_u ">
@@ -117,9 +150,10 @@
                     <td>{{data.password}}</td>
                     <td>{{data.perfiles}}</td>
                     <td class="text-center">
-                        <a href="/update/{{data.id}}" class="bi-pencil-fill edit_action" title="edit"
+                        <a href="/update/{{data.id}}" class="bi-pencil-fill edit_action" title="editar"
                             data-bs-toggle="modal" data-bs-target="#edit{{data.id}}"></a>
-                        <a href="/delete/{{data.id}}" class="bi-eraser-fill btn-delete" title="delete"></a>
+                        <a href="/InhabilUser/{{data.id}}" class="bi bi-ban btn-inhabi" title="Inhabilitar"></a>
+                        <a href="/delete/{{data.id}}" class="bi-eraser-fill btn-delete" title="eliminar"></a>
                     </td>
                 </tr>
 
@@ -135,20 +169,44 @@
                             </div>
                             <form action="/update/{{data.id}}" method="POST">
                                 <div class="modal-body" class="form-control form-login-register">
-
+                                    {%with messages = get_flashed_messages(with_categories=true)%}
+                                    {%if messages and dupliErrEdit%}
+                                    {% for category, message in messages %}
+                                    <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
+                                        {{message}}</div>
+                                    {%endfor%}
+                                    {%endif%}
+                                    {%endwith%}
                                     <div class="form-group mb-3 modalForm">
                                         <label for="exampleInputEmail1">Usuario</label>
                                         <input type="text" class="form-control" id="exampleInputEmail1"
                                             aria-describedby="emailHelp" placeholder="Ingrese usuario" name="txtCorreo"
                                             value="{{data.name}}">
+                                        {%with messages = get_flashed_messages(with_categories=true)%}
+                                        {%if messages and correoErrEdit%}
+                                        {% for category, message in messages %}
+                                        <div class="alert alert-{{category}} alert-dismissible fade show mt-3"
+                                            role="alert">{{message}}</div>
+                                        {%endfor%}
+                                        {%endif%}
+                                        {%endwith%}
                                     </div>
                                     <div class="form-group mb-4 modalForm">
                                         <label for="exampleInputPassword1">Contraseña</label>
                                         <input type="password" class="form-control" id="exampleInputPassword1"
                                             placeholder="Contraseña" name="txtPassword" value="{{data.password}}">
+                                        {%with messages = get_flashed_messages(with_categories=true)%}
+                                        {%if messages and contraErrEdit%}
+                                        {% for category, message in messages %}
+                                        <div class="alert alert-{{category}} alert-dismissible fade show mt-3"
+                                            role="alert">{{message}}</div>
+                                        {%endfor%}
+                                        {%endif%}
+                                        {%endwith%}
                                     </div>
                                     <div class="modal-footer">
-                                        <button class="btn btn-outline-danger" data-bs-dismiss="modal" type="button">Cancelar</button>
+                                        <button class="btn btn-outline-danger" data-bs-dismiss="modal"
+                                            type="button">Cancelar</button>
                                         <button class="btn btn-outline-primary" type="submit">Actualizar</button>
                                     </div>
 
@@ -181,8 +239,33 @@
                 });
             })
         }
+        const btninhabili = document.querySelectorAll('.btn-inhabi');
+        if (btninhabili) {
+            const btnArray = Array.from(btninhabili);
+            btnArray.forEach((btn) => {
+                btn.addEventListener('click', (e) => {
+                    if (!confirm('Esta seguro que desea inhabilitar el registro?')) {
+                        e.preventDefault();
+                    }
+                });
+            })
+        }
     </script>
+    {% if add_modal %}
+    <script>
+        $(document).ready(function () {
+            $('#userModal').modal('show');
+        });
+    </script>
+    {% endif %}
 
+    {% if edit_modal %}
+    <script>
+        $(document).ready(function () {
+            $('#edit{{edit_modal}}').modal('show');
+        });
+    </script>
+    {% endif %}
 </body>
 
 </html>

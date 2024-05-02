@@ -40,11 +40,24 @@
 
                 <form action="/add-tip" method="POST">
                     <div class="modal-body" class="form-control form-login-register">
-
+                                {%with messages = get_flashed_messages(with_categories=true)%}
+                                {%if messages and dupliErr%}
+                                {% for category, message in messages %}
+                                <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}</div>
+                                {%endfor%}
+                                {%endif%}
+                                {%endwith%}
                         <div class="form-group mb-3 modalForm">
                             <label for="exampleInputEmail1">Tipo Cliente</label>
                             <input type="text" class="form-control" id="usertxt" aria-describedby="emailHelp"
-                                placeholder="Ingrese el tipo cliente" name="txtTip" value="">
+                                placeholder="Ingrese el tipo cliente" name="txtTip" value="{{tipe}}">
+                                {%with messages = get_flashed_messages(with_categories=true)%}
+                                {%if messages and tipErr%}
+                                {% for category, message in messages %}
+                                <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}</div>
+                                {%endfor%}
+                                {%endif%}
+                                {%endwith%}
                         </div>
                         <div class="form-group mb-4 modalForm">
                             <label for="exampleInputPassword1">Estado</label>
@@ -79,17 +92,18 @@
                     data-bs-target="#perfilModal"> Nuevo tipo cliente</button>
         </div>
 
-        {%with messages = get_flashed_messages(with_categories=true)%}
-        {%if messages%}
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close">
-            </button>
-            {{message}}
-        </div>
-        {%endfor%}
-        {%endif%}
-        {%endwith%}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {% if category == 'success' or category == 'warning' %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
+                        {{ message }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
 
         
         <table id="example" class="table table-striped div_">
@@ -110,28 +124,41 @@
                     <td class="text-center">
                         <a href="/updateTipClient/{{data.idtipo_clientes}}" class="bi-pencil-fill edit_action" title="edit"
                             data-bs-toggle="modal" data-bs-target="#editModal{{data.idtipo_clientes}}"></a>
+                        <a href="/InhabilTipClient/{{data.idtipo_clientes}}" class="bi bi-ban btn-inhabi" title="Inhabilitar"></a>
                         <a href="/deleteTipClient/{{data.idtipo_clientes}}" class="bi-eraser-fill btn-delete" title="delete"></a>
+                        
                     </td>
                 </tr>
 
                 <!-- Edicion -->
                 <div class="modal fade" id="editModal{{data.idtipo_clientes}}" data-bs-backdrop="static" role="dialog">
                     <div class="modal-dialog modal-dialog-scrollable">
-
                         <div class="modal-content">
-
                             <div class="modal-header">
                                 <h5>Editar Tipo Cliente</h5>
                                 <button class="btn-close" data-bs-dismiss="modal" title="exit"></button>
                             </div>
                             <form action="/updateTipClient/{{data.idtipo_clientes}}" method="POST">
                                 <div class="modal-body" class="form-control form-login-register">
-
+                                            {%with messages = get_flashed_messages(with_categories=true)%}
+                                            {%if messages and dupliErr%}
+                                            {% for category, message in messages %}
+                                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}</div>
+                                            {%endfor%}
+                                            {%endif%}
+                                            {%endwith%}
                                     <div class="form-group mb-3 modalForm">
                                         <label for="exampleInputEmail1">Tipo Cliente</label>
                                         <input type="text" class="form-control" id="exampleInputEmail1"
                                             aria-describedby="emailHelp" placeholder="Ingrese tipo de cliente" name="txtTip"
                                             value="{{data.tipo}}">
+                                            {%with messages = get_flashed_messages(with_categories=true)%}
+                                            {%if messages and tipErr%}
+                                            {% for category, message in messages %}
+                                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}</div>
+                                            {%endfor%}
+                                            {%endif%}
+                                            {%endwith%}
                                     </div>
                                     <div class="form-group mb-4 modalForm">
                                         <label for="exampleInputPassword1">Estado</label>
@@ -174,8 +201,34 @@
                 });
             })
         }
+        const btninhabili = document.querySelectorAll('.btn-inhabi');
+        if (btninhabili) {
+            const btnArray = Array.from(btninhabili);
+            btnArray.forEach((btn) => {
+                btn.addEventListener('click', (e) => {
+                    if (!confirm('Esta seguro que desea inhabilitar el registro?')) {
+                        e.preventDefault();
+                    }
+                });
+            })
+        }
     </script>
 
+    {% if add_modal %}
+    <script>
+        $(document).ready(function() {
+            $('#perfilModal').modal('show');
+        });
+    </script>
+    {% endif %}
+
+    {% if edit_modal %}
+    <script>
+        $(document).ready(function() {
+            $('#editModal{{edit_modal}}').modal('show');
+        });
+    </script>
+    {% endif %}
 </body>
 
 </html>

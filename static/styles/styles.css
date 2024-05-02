@@ -15,6 +15,10 @@
     color: cornflowerblue
 }
 
+.btn-inhabi{
+    color: #dfce35;
+}
+
 .btnregister {
     background-color: rgb(26, 141, 78);
     color: #fff;
@@ -58,4 +62,8 @@
 
 .new_title{
     align-content: center;
+}
+
+.btn-inhabi{
+    color: #dfce35;
 }

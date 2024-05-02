@@ -40,52 +40,115 @@
 
                 <form action="/add-clientes" method="POST">
                     <div class="modal-body" class="form-control form-login-register">
-
+                                {%with messages = get_flashed_messages(with_categories=true)%}
+                                {%if messages and dupliErr%}
+                                {% for category, message in messages %}
+                                <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}</div>
+                                {%endfor%}
+                                {%endif%}
+                                {%endwith%}
+                        <div class="form-group mb-3 modalForm">
+                            <label for="exampleInputEmail1">Cédula</label>
+                            <input type="text" class="form-control" id="usertxt52" aria-describedby="emailHelp"
+                                placeholder="Ingrese su cédula" name="txtCc" value="{{cc}}" pattern="\d*" 
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                {%with messages = get_flashed_messages(with_categories=true)%}
+                                {%if messages and ccErr%}
+                                {% for category, message in messages %}
+                                <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}</div>
+                                {%endfor%}
+                                {%endif%}
+                                {%endwith%}
+                        </div>
                         <div class="form-group mb-3 modalForm">
                             <label for="exampleInputEmail1">Primer Nombre</label>
                             <input type="text" class="form-control" id="usertxt12" aria-describedby="emailHelp"
-                                placeholder="Ingrese el primer nombre" name="txtName1" value="">
+                                placeholder="Ingrese el primer nombre" name="txtName1" value="{{nam1}}">
+                                {%with messages = get_flashed_messages(with_categories=true)%}
+                                {%if messages and nam1Err%}
+                                {% for category, message in messages %}
+                                <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}</div>
+                                {%endfor%}
+                                {%endif%}
+                                {%endwith%}
                         </div>
                         <div class="form-group mb-3 modalForm">
                             <label for="exampleInputEmail1">Segundo Nombre</label>
                             <input type="text" class="form-control" id="usertxt22" aria-describedby="emailHelp"
-                                placeholder="Ingrese el segundo nombre" name="txtName2" value="">
+                                placeholder="Ingrese el segundo nombre" name="txtName2" value="{{nam2}}">
+                                {%with messages = get_flashed_messages(with_categories=true)%}
+                                {%if messages and nam2Err%}
+                                {% for category, message in messages %}
+                                <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}</div>
+                                {%endfor%}
+                                {%endif%}
+                                {%endwith%}
                         </div>
                         <div class="form-group mb-3 modalForm">
                             <label for="exampleInputEmail1">Primer Apellido</label>
                             <input type="text" class="form-control" id="usertxt32" aria-describedby="emailHelp"
-                                placeholder="Ingrese el primer apellido" name="txtAp1" value="">
+                                placeholder="Ingrese el primer apellido" name="txtAp1" value="{{ape1}}">
+                                {%with messages = get_flashed_messages(with_categories=true)%}
+                                {%if messages and ape1Err%}
+                                {% for category, message in messages %}
+                                <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}</div>
+                                {%endfor%}
+                                {%endif%}
+                                {%endwith%}
                         </div>
                         <div class="form-group mb-3 modalForm">
                             <label for="exampleInputEmail1">Segundo Apellido</label>
                             <input type="text" class="form-control" id="usertxt42" aria-describedby="emailHelp"
-                                placeholder="Ingrese el segundo apellido" name="txtAp2" value="">
-                        </div>
-                        <div class="form-group mb-3 modalForm">
-                            <label for="exampleInputEmail1">Cédula</label>
-                            <input type="text" class="form-control" id="usertxt52" aria-describedby="emailHelp"
-                                placeholder="Ingrese su cédula" name="txtCc" value="" pattern="\d*" 
-                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                        </div>
+                                placeholder="Ingrese el segundo apellido" name="txtAp2" value="{{ape2}}">
+                                {%with messages = get_flashed_messages(with_categories=true)%}
+                                {%if messages and ape2Err%}
+                                {% for category, message in messages %}
+                                <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}</div>
+                                {%endfor%}
+                                {%endif%}
+                                {%endwith%}
+                                
+                        </div>                       
                         <div class="form-group mb-3 modalForm">
                             <label for="exampleInputEmail1">Telefono</label>
                             <input type="text" class="form-control" id="usertxt62" aria-describedby="emailHelp"
-                                placeholder="Ingrese su telefono" name="txtTel" value=""  pattern="\d*" 
+                                placeholder="Ingrese su telefono" name="txtTel" value="{{tel}}"  pattern="\d*" 
                                 oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                {%with messages = get_flashed_messages(with_categories=true)%}
+                                {%if messages and telErr%}
+                                {% for category, message in messages %}
+                                <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}</div>
+                                {%endfor%}
+                                {%endif%}
+                                {%endwith%}
                         </div>
                         <div class="form-group mb-4 modalForm">
                             <label for="exampleInputPassword1">Correo</label>
                             <input type="email" class="form-control" id="passwordtxt2" placeholder="Ingrese el correo"
-                                name="txtMail" value="">
+                                name="txtMail" value="{{mail}}">
+                                {%with messages = get_flashed_messages(with_categories=true)%}
+                                {%if messages and mailErr%}
+                                {% for category, message in messages %}
+                                <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}</div>
+                                {%endfor%}
+                                {%endif%}
+                                {%endwith%}
                         </div>
                         <div class="form-group mb-4 modalForm">
                             <label for="exampleInputPassword1">Tipo persona</label>
                             <select name="tipoPersona" class="form-control" title="option">
-                                    <option value="">Seleccionar...</option>
+                                    <option value="-1">Seleccionar...</option>
                                 {% for opcion in dataOpt %}
                                     <option value="{{ opcion.idtipo_clientes }}">{{ opcion.tipo }}</option>
                                 {% endfor %}
                             </select>
+                            {%with messages = get_flashed_messages(with_categories=true)%}
+                            {%if messages and allErr%}
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}</div>
+                            {%endfor%}
+                            {%endif%}
+                            {%endwith%}
                         </div>
                         <div class="form-group mb-4 modalForm">
                             <label for="exampleInputPassword1">Estado</label>
@@ -121,17 +184,18 @@
                     data-bs-target="#userModal"> Nuevo cliente</button>
         </div>
 
-        {%with messages = get_flashed_messages(with_categories=true)%}
-        {%if messages%}
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close">
-            </button>
-            {{message}}
-        </div>
-        {%endfor%}
-        {%endif%}
-        {%endwith%}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {% if category == 'success' or category == 'warning' %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
+                        {{ message }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
 
         
         <table id="example" class="table table-striped div_">
@@ -164,9 +228,10 @@
                     <td>{{data.tipo}}</td>
                     <td>{{data.status}}</td>
                     <td class="text-center">
-                        <a href="/updateCliente/{{data.idclientes}}" class="bi-pencil-fill edit_action" title="edit"
+                        <a href="/updateCliente/{{data.idclientes}}" class="bi-pencil-fill edit_action" title="editar"
                             data-bs-toggle="modal" data-bs-target="#edit{{data.idclientes}}"></a>
-                        <a href="/deleteCliente/{{data.idclientes}}" class="bi-eraser-fill btn-delete" title="delete"></a>
+                        <a href="/InhabilCliente/{{data.idclientes}}" class="bi bi-ban btn-inhabi" title="Inhabilitar"></a>
+                        <a href="/deleteCliente/{{data.idclientes}}" class="bi-eraser-fill btn-delete" title="Borrar"></a>
                     </td>
                 </tr>
 
@@ -182,40 +247,96 @@
                             </div>
                             <form action="/updateCliente/{{data.idclientes}}" method="POST">
                                 <div class="modal-body" class="form-control form-login-register">
+                                    {%with messages = get_flashed_messages(with_categories=true)%}
+                                    {%if messages and dupliErr%}
+                                    {% for category, message in messages %}
+                                    <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}</div>
+                                    {%endfor%}
+                                    {%endif%}
+                                    {%endwith%}
+                                    <div class="form-group mb-3 modalForm">
+                                        <label for="exampleInputEmail1">Cedula</label>
+                                        <input type="text" class="form-control" id="usertxt5" aria-describedby="emailHelp"
+                                            placeholder="Ingrese su cédula" name="txtCc" value="{{data.cedula}}">
+                                            {%with messages = get_flashed_messages(with_categories=true)%}
+                                            {%if messages and ccErr%}
+                                            {% for category, message in messages %}
+                                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}</div>
+                                            {%endfor%}
+                                            {%endif%}
+                                            {%endwith%}
+                                    </div>
                                     <div class="form-group mb-3 modalForm">
                                         <label for="exampleInputEmail1">Primer Nombre</label>
                                         <input type="text" class="form-control" id="usertxt1" aria-describedby="emailHelp"
                                             placeholder="Ingrese el primer nombre" name="txtName1" value="{{data.nombre_1}}">
+                                            {%with messages = get_flashed_messages(with_categories=true)%}
+                                            {%if messages and nam1Err%}
+                                            {% for category, message in messages %}
+                                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}</div>
+                                            {%endfor%}
+                                            {%endif%}
+                                            {%endwith%}
                                     </div>
                                     <div class="form-group mb-3 modalForm">
                                         <label for="exampleInputEmail1">Segundo Nombre</label>
                                         <input type="text" class="form-control" id="usertxt2" aria-describedby="emailHelp"
                                             placeholder="Ingrese el segundo nombre" name="txtName2" value="{{data.nombre_2}}">
+                                            {%with messages = get_flashed_messages(with_categories=true)%}
+                                            {%if messages and nam2Err%}
+                                            {% for category, message in messages %}
+                                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}</div>
+                                            {%endfor%}
+                                            {%endif%}
+                                            {%endwith%}
                                     </div>
                                     <div class="form-group mb-3 modalForm">
                                         <label for="exampleInputEmail1">Primer Apellido</label>
                                         <input type="text" class="form-control" id="usertxt3" aria-describedby="emailHelp"
                                             placeholder="Ingrese el primer apellido" name="txtAp1" value="{{data.apellido_1}}">
+                                            {%with messages = get_flashed_messages(with_categories=true)%}
+                                            {%if messages and ape1Err%}
+                                            {% for category, message in messages %}
+                                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}</div>
+                                            {%endfor%}
+                                            {%endif%}
+                                            {%endwith%}
                                     </div>
                                     <div class="form-group mb-3 modalForm">
                                         <label for="exampleInputEmail1">Segundo Apellido</label>
                                         <input type="text" class="form-control" id="usertxt4" aria-describedby="emailHelp"
                                             placeholder="Ingrese el segundo apellido" name="txtAp2" value="{{data.apellido_2}}">
-                                    </div>
-                                    <div class="form-group mb-3 modalForm">
-                                        <label for="exampleInputEmail1">Cedula</label>
-                                        <input type="text" class="form-control" id="usertxt5" aria-describedby="emailHelp"
-                                            placeholder="Ingrese su cédula" name="txtCc" value="{{data.cedula}}">
+                                            {%with messages = get_flashed_messages(with_categories=true)%}
+                                            {%if messages and ape2Err%}
+                                            {% for category, message in messages %}
+                                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}</div>
+                                            {%endfor%}
+                                            {%endif%}
+                                            {%endwith%}
                                     </div>
                                     <div class="form-group mb-3 modalForm">
                                         <label for="exampleInputEmail1">Telefono</label>
                                         <input type="text" class="form-control" id="usertxt6" aria-describedby="emailHelp"
                                             placeholder="Ingrese su telefono" name="txtTel" value="{{data.telefono}}">
+                                            {%with messages = get_flashed_messages(with_categories=true)%}
+                                            {%if messages and telErr%}
+                                            {% for category, message in messages %}
+                                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}</div>
+                                            {%endfor%}
+                                            {%endif%}
+                                            {%endwith%}
                                     </div>
                                     <div class="form-group mb-4 modalForm">
                                         <label for="exampleInputPassword1">Correo</label>
                                         <input type="email" class="form-control" id="passwordtxt" placeholder="Ingrese el correo"
                                             name="txtMail" value="{{data.correo}}">
+                                            {%with messages = get_flashed_messages(with_categories=true)%}
+                                            {%if messages and mailErr%}
+                                            {% for category, message in messages %}
+                                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}</div>
+                                            {%endfor%}
+                                            {%endif%}
+                                            {%endwith%}
                                     </div>
                                     <div class="form-group mb-4 modalForm">
                                         <label for="exampleInputPassword1">Tipo persona</label>
@@ -225,6 +346,13 @@
                                                 <option value="{{ opcion.idtipo_clientes }}">{{ opcion.tipo }}</option>
                                             {% endfor %}
                                         </select>
+                                        {%with messages = get_flashed_messages(with_categories=true)%}
+                                        {%if messages and allErr%}
+                                        {% for category, message in messages %}
+                                        <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}</div>
+                                        {%endfor%}
+                                        {%endif%}
+                                        {%endwith%}
                                     </div>
                                     <div class="form-group mb-4 modalForm">
                                         <label for="exampleInputPassword1">Estado</label>
@@ -267,7 +395,33 @@
                 });
             })
         }
+        const btninhabili = document.querySelectorAll('.btn-inhabi');
+        if (btninhabili) {
+            const btnArray = Array.from(btninhabili);
+            btnArray.forEach((btn) => {
+                btn.addEventListener('click', (e) => {
+                    if (!confirm('Esta seguro que desea inhabilitar el registro?')) {
+                        e.preventDefault();
+                    }
+                });
+            })
+        }
     </script>
+    {% if add_modal %}
+    <script>
+        $(document).ready(function() {
+            $('#userModal').modal('show');
+        });
+    </script>
+    {% endif %}
+
+    {% if edit_modal %}
+    <script>
+        $(document).ready(function() {
+            $('#edit{{edit_modal}}').modal('show');
+        });
+    </script>
+    {% endif %}
 
 </body>
 

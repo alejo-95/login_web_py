@@ -24,13 +24,13 @@
 </head>
 
 <body accesskey="">
-    
+
     <div id="perfilModal" class="modal fade" role="dialog" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h5 class="modal-title text-primary" style="align-content: center;">
+                    <h5 class="modal-title text-primary new_title">
                         Por favor cree un nuevo cultivo
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" title="exit">
@@ -41,30 +41,63 @@
                 <form action="/add-cult" method="POST">
                     <div class="modal-body" class="form-control form-login-register">
 
+                        {%with messages = get_flashed_messages(with_categories=true)%}
+                        {%if messages and dupliErr%}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">{{message}}
+                        </div>
+                        {%endfor%}
+                        {%endif%}
+                        {%endwith%}
                         <div class="form-group mb-3 modalForm">
                             <label for="exampleInputEmail1">Cultivo</label>
                             <input type="text" class="form-control" id="cultivo1" aria-describedby="emailHelp"
-                                placeholder="Ingrese el cultivo" name="txtCulti" value="">
+                                placeholder="Ingrese el cultivo" name="txtCulti" value="{{cul}}">
+                            {%with messages = get_flashed_messages(with_categories=true)%}
+                            {%if messages and culErr%}
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
+                                {{message}}</div>
+                            {%endfor%}
+                            {%endif%}
+                            {%endwith%}
                         </div>
                         <div class="form-group mb-3 modalForm">
                             <label for="exampleInputEmail1">Temperatura minima</label>
                             <input type="text" class="form-control" id="temp_min1" aria-describedby="emailHelp"
-                                placeholder="Ingrese la temperatura minima" name="txtTempMin" value="">
+                                placeholder="Ingrese la temperatura minima" name="txtTempMin" value="{{temMin}}">
+                            {%with messages = get_flashed_messages(with_categories=true)%}
+                            {%if messages and temMinErr%}
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
+                                {{message}}</div>
+                            {%endfor%}
+                            {%endif%}
+                            {%endwith%}
                         </div>
                         <div class="form-group mb-3 modalForm">
                             <label for="exampleInputEmail1">Temperatura maxima</label>
                             <input type="text" class="form-control" id="temp_max1" aria-describedby="emailHelp"
-                                placeholder="Ingrese la temperatura maxima" name="txtTempMax" value="">
+                                placeholder="Ingrese la temperatura maxima" name="txtTempMax" value="{{temMax}}">
+                            {%with messages = get_flashed_messages(with_categories=true)%}
+                            {%if messages and temMaxErr%}
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
+                                {{message}}</div>
+                            {%endfor%}
+                            {%endif%}
+                            {%endwith%}
                         </div>
                         <div class="form-group mb-4 modalForm">
                             <label for="exampleInputPassword1">Estado</label>
                             <select name="state" class="form-control" title="option2">
-                                    <option value="0">Habilitado</option>
-                                    <option value="1">Deshabilitado</option>
+                                <option value="0">Habilitado</option>
+                                <option value="1">Deshabilitado</option>
                             </select>
                         </div>
                         <div class="modal-footer">
-                            <button class="btn btn-outline-danger" data-bs-dismiss="modal" type="reset">Cancelar</button>
+                            <button class="btn btn-outline-danger" data-bs-dismiss="modal"
+                                type="reset">Cancelar</button>
                             <button class="btn btn-outline-success" type="submit">Guardar</button>
                         </div>
 
@@ -85,23 +118,24 @@
         </div>
 
         <div>
-            <button class="btn btn-outline-success" data-bs-toggle="modal"
-                    data-bs-target="#perfilModal"> Nuevo Cultivo</button>
+            <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#perfilModal"> Nuevo
+                Cultivo</button>
         </div>
 
-        {%with messages = get_flashed_messages(with_categories=true)%}
-        {%if messages%}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
         {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close">
-            </button>
-            {{message}}
+        {% if category == 'success' or category == 'warning' %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
+            {{ message }}
         </div>
-        {%endfor%}
-        {%endif%}
-        {%endwith%}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
 
-        
+
         <table id="example" class="table table-striped div_">
             <thead>
                 <tr class="table_u ">
@@ -124,7 +158,10 @@
                     <td class="text-center">
                         <a href="/updateCultivo/{{data.idcultivos}}" class="bi-pencil-fill edit_action" title="edit"
                             data-bs-toggle="modal" data-bs-target="#editModal{{data.idcultivos}}"></a>
-                        <a href="/deleteCultivo/{{data.idcultivos}}" class="bi-eraser-fill btn-delete" title="delete"></a>
+                        <a href="/InhabilCultivo/{{data.idcultivos}}" class="bi bi-ban btn-inhabi"
+                            title="Inhabilitar"></a>
+                        <a href="/deleteCultivo/{{data.idcultivos}}" class="bi-eraser-fill btn-delete"
+                            title="delete"></a>
                     </td>
                 </tr>
 
@@ -140,30 +177,70 @@
                             </div>
                             <form action="/updateCultivo/{{data.idcultivos}}" method="POST">
                                 <div class="modal-body" class="form-control form-login-register">
+                                    {%with messages = get_flashed_messages(with_categories=true)%}
+                                    {%if messages and dupliErrEdit%}
+                                    {% for category, message in messages %}
+                                    <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
+                                        {{message}}
+                                    </div>
+                                    {%endfor%}
+                                    {%endif%}
+                                    {%endwith%}
                                     <div class="form-group mb-3 modalForm">
                                         <label for="exampleInputEmail1">Cultivo</label>
-                                        <input type="text" class="form-control" id="cultivo" aria-describedby="emailHelp"
-                                            placeholder="Ingrese el tamaño" name="txtCulti" value="{{data.cultivo}}">
+                                        <input type="text" class="form-control" id="cultivo"
+                                            aria-describedby="emailHelp" placeholder="Ingrese el tamaño" name="txtCulti"
+                                            value="{{data.cultivo}}">
+                                        {%with messages = get_flashed_messages(with_categories=true)%}
+                                        {%if messages and culErrEdit%}
+                                        {% for category, message in messages %}
+                                        <div class="alert alert-{{category}} alert-dismissible fade show mt-3"
+                                            role="alert">{{message}}
+                                        </div>
+                                        {%endfor%}
+                                        {%endif%}
+                                        {%endwith%}
                                     </div>
                                     <div class="form-group mb-3 modalForm">
                                         <label for="exampleInputEmail1">Temperatura minima</label>
-                                        <input type="text" class="form-control" id="temp_min" aria-describedby="emailHelp"
-                                            placeholder="Ingrese el tamaño" name="txtTempMin" value="{{data.temp_min}}">
+                                        <input type="text" class="form-control" id="temp_min"
+                                            aria-describedby="emailHelp" placeholder="Ingrese el tamaño"
+                                            name="txtTempMin" value="{{data.temp_min}}">
+                                        {%with messages = get_flashed_messages(with_categories=true)%}
+                                        {%if messages and temMinErrEdit%}
+                                        {% for category, message in messages %}
+                                        <div class="alert alert-{{category}} alert-dismissible fade show mt-3"
+                                            role="alert">{{message}}
+                                        </div>
+                                        {%endfor%}
+                                        {%endif%}
+                                        {%endwith%}
                                     </div>
                                     <div class="form-group mb-3 modalForm">
                                         <label for="exampleInputEmail1">Temperatura maxima</label>
-                                        <input type="text" class="form-control" id="temp_max" aria-describedby="emailHelp"
-                                            placeholder="Ingrese el tamaño" name="txtTempMax" value="{{data.temp_max}}">
+                                        <input type="text" class="form-control" id="temp_max"
+                                            aria-describedby="emailHelp" placeholder="Ingrese el tamaño"
+                                            name="txtTempMax" value="{{data.temp_max}}">
+                                        {%with messages = get_flashed_messages(with_categories=true)%}
+                                        {%if messages and temMaxErrEdit%}
+                                        {% for category, message in messages %}
+                                        <div class="alert alert-{{category}} alert-dismissible fade show mt-3"
+                                            role="alert">{{message}}
+                                        </div>
+                                        {%endfor%}
+                                        {%endif%}
+                                        {%endwith%}
                                     </div>
                                     <div class="form-group mb-4 modalForm">
                                         <label for="exampleInputPassword1">Estado</label>
                                         <select name="state" class="form-control" title="option2">
-                                                <option value="0">Habilitado</option>
-                                                <option value="1">Deshabilitado</option>
+                                            <option value="0">Habilitado</option>
+                                            <option value="1">Deshabilitado</option>
                                         </select>
                                     </div>
                                     <div class="modal-footer">
-                                        <button class="btn btn-outline-danger" data-bs-dismiss="modal" type="button">Cancelar</button>
+                                        <button class="btn btn-outline-danger" data-bs-dismiss="modal"
+                                            type="button">Cancelar</button>
                                         <button class="btn btn-outline-primary" type="submit">Actualizar</button>
                                     </div>
 
@@ -196,8 +273,33 @@
                 });
             })
         }
+        const btninhabili = document.querySelectorAll('.btn-inhabi');
+        if (btninhabili) {
+            const btnArray = Array.from(btninhabili);
+            btnArray.forEach((btn) => {
+                btn.addEventListener('click', (e) => {
+                    if (!confirm('Esta seguro que desea inhabilitar el registro?')) {
+                        e.preventDefault();
+                    }
+                });
+            })
+        }
     </script>
+    {% if add_modal %}
+    <script>
+        $(document).ready(function () {
+            $('#perfilModal').modal('show');
+        });
+    </script>
+    {% endif %}
 
+    {% if edit_modal %}
+    <script>
+        $(document).ready(function () {
+            $('#editModal{{edit_modal}}').modal('show');
+        });
+    </script>
+    {% endif %}
 </body>
 
 </html>
