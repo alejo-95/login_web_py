@@ -49,6 +49,19 @@
                         {%endif%}
                         {%endwith%}
                         <div class="form-group mb-3 modalForm">
+                            <label for="exampleInputEmail1">Cédula</label>
+                            <input type="text" class="form-control" id="cedulatxt" aria-describedby="emailHelp"
+                                placeholder="Ingrese la cédula del cliente" name="txtCedula" value="">
+                            {%with messages = get_flashed_messages(with_categories=true)%}
+                            {%if messages and ccErr%}
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
+                                {{message}}</div>
+                            {%endfor%}
+                            {%endif%}
+                            {%endwith%}
+                        </div>
+                        <div class="form-group mb-3 modalForm">
                             <label for="exampleInputEmail1">Usuario</label>
                             <input type="text" class="form-control" id="usertxt" aria-describedby="emailHelp"
                                 placeholder="Ingrese el usuario" name="txtCorreo" value="{{correo}}">
@@ -111,12 +124,14 @@
             <h3 class="text-center title_module">
                 Gestión usuarios
             </h3>
-        </div>
 
+        </div>
+        {% if 'idperfil' in session and session['idperfil'] == 1 %}
         <div>
             <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#userModal"> Nuevo
                 usuario</button>
         </div>
+        {%endif%}
 
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -139,7 +154,9 @@
                     <th>Usuario</th>
                     <th>Contraseña</th>
                     <th>Perfil</th>
+                    {% if 'idperfil' in session and session['idperfil'] == 1 %}
                     <th>Acción</th>
+                    {%endif%}
                 </tr>
             </thead>
             <tbody>
@@ -149,12 +166,14 @@
                     <td>{{data.name}}</td>
                     <td>{{data.password}}</td>
                     <td>{{data.perfiles}}</td>
+                    {% if 'idperfil' in session and session['idperfil'] == 1 %}
                     <td class="text-center">
                         <a href="/update/{{data.id}}" class="bi-pencil-fill edit_action" title="editar"
                             data-bs-toggle="modal" data-bs-target="#edit{{data.id}}"></a>
                         <a href="/InhabilUser/{{data.id}}" class="bi bi-ban btn-inhabi" title="Inhabilitar"></a>
                         <a href="/delete/{{data.id}}" class="bi-eraser-fill btn-delete" title="eliminar"></a>
                     </td>
+                    {%endif%}
                 </tr>
 
                 <!-- Edicion -->

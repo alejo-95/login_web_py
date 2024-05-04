@@ -374,6 +374,7 @@ def addUser():
     correo = request.form['txtCorreo']
     password = request.form['txtPassword']
     perfil_id = request.form['perfil']
+    cc = request.form['txtCedula']
     #print(request.form)
     
     cur = mysql.connection.cursor()
@@ -383,7 +384,13 @@ def addUser():
     data = cur.fetchall() 
     cur.execute('SELECT idperfiles, perfiles FROM perfiles ')
     dataOpt = cur.fetchall()
+    cur.execute('Select cedula from clientes where cedula =  %s',(cc,))
+    cedula = cur.fetchone()
     cur.close()
+    
+    if not cedula:
+        flash('El cliente ingresado no es valido valido','danger')
+        return render_template('Users/list_user.html', users = data, dataOpt= dataOpt, correo=correo, ccErr= True, add_modal=True)
     
     if  busquedaCC: 
         flash(f'El usuario {correo} ya se encuentra creado', 'danger')
@@ -403,7 +410,7 @@ def addUser():
     else:
         try:
             cur = mysql.connection.cursor()
-            cur.execute("INSERT INTO usuarios (name, password, idperfil) VALUES (%s, %s, %s)", (correo, password, perfil_id))
+            cur.execute("INSERT INTO usuarios (name, password, idperfil, cliente) VALUES (%s, %s, %s, %s)", (correo, password, perfil_id, cc))
             mysql.connection.commit()
             cur.close()
             flash('Usuario agregado con exito', 'success')
@@ -561,7 +568,7 @@ def InhaPerfil(id):
     return redirect(url_for('ListPerfil'))
 
 
-#Metodos para accesorios
+#Metodos para sensores
 #Listar
 @app.route('/listar-acce')
 def ListAcce():
@@ -570,7 +577,7 @@ def ListAcce():
     cur.execute("""SELECT idaccesorios,accesorios,
                     Case when estado = 0 then 'Habilitado' When estado = 1 then 'Deshabilitado' 
                     End as status
-                    FROM accesorios""")
+                    FROM tipo_sensor""")
     data = cur.fetchall()
 
     cur.close()
@@ -584,14 +591,14 @@ def updateAcce(id):
         #print(state)
         
         cur = mysql.connection.cursor()
-        cur.execute('Select accesorios from accesorios where accesorios = %s',(acce,))
+        cur.execute('Select accesorios from tipo_sensor where accesorios = %s',(acce,))
         busquedaCC = cur.fetchone()
-        cur.execute('Select accesorios, estado from accesorios where idaccesorios = %s',(id,))
+        cur.execute('Select accesorios, estado from tipo_sensor where idaccesorios = %s',(id,))
         repe = cur.fetchone()
         cur.execute("""SELECT idaccesorios,accesorios,
                     Case when estado = 0 then 'Habilitado' When estado = 1 then 'Deshabilitado' 
                     End as status
-                    FROM accesorios""")
+                    FROM tipo_sensor""")
         data = cur.fetchall()
         cur.close()
 
@@ -610,7 +617,7 @@ def updateAcce(id):
         else:
             cur=mysql.connection.cursor()
             cur.execute("""
-                UPDATE accesorios
+                UPDATE tipo_sensor
                 SET accesorios = %s
                     
                 WHERE idaccesorios = %s
@@ -624,7 +631,7 @@ def deleteAcce(id):
     
     try:
         cur=mysql.connection.cursor()   
-        cur.execute('DELETE FROM accesorios WHERE idaccesorios = {0}'.format(id))
+        cur.execute('DELETE FROM tipo_sensor WHERE idaccesorios = {0}'.format(id))
         mysql.connection.commit()
         flash('Accesorio eliminado exitosamente')
         return redirect(url_for('ListAcce'))
@@ -643,12 +650,12 @@ def addAcce():
     state = request.form['state']
     
     cur = mysql.connection.cursor()
-    cur.execute('Select accesorios from accesorios where accesorios = %s',(acce,))
+    cur.execute('Select accesorios from tipo_sensor where accesorios = %s',(acce,))
     busquedaCC = cur.fetchone()
     cur.execute("""SELECT idaccesorios,accesorios,
                     Case when estado = 0 then 'Habilitado' When estado = 1 then 'Deshabilitado' 
                     End as status
-                    FROM accesorios""")
+                    FROM tipo_sensor""")
     data = cur.fetchall()
     cur.close()
     
@@ -663,7 +670,7 @@ def addAcce():
 
         try:
             cur = mysql.connection.cursor()
-            cur.execute("INSERT INTO accesorios (accesorios, estado) VALUES (%s, %s)", (acce, state))
+            cur.execute("INSERT INTO tipo_sensor (accesorios, estado) VALUES (%s, %s)", (acce, state))
             mysql.connection.commit()
             flash('Accesorio agregado con exito')
             return redirect(url_for('ListAcce'))
@@ -675,7 +682,7 @@ def addAcce():
 def InhaAcce(id): 
     try:
         cur=mysql.connection.cursor()
-        cur.execute('Update accesorios  set estado = 1 WHERE idaccesorios = {0}'.format(id))
+        cur.execute('Update tipo_sensor  set estado = 1 WHERE idaccesorios = {0}'.format(id))
         mysql.connection.commit()
         cur.close()
         flash('Accesorio inhabilitado exitosamente', 'success')
@@ -698,7 +705,7 @@ def ListArd():
     cur.execute("""SELECT idarduinos,arduino,
                     Case when estado = 0 then 'Habilitado' When estado = 1 then 'Deshabilitado' 
                     End as status
-                    FROM arduinos""")
+                    FROM tipo_arduino""")
     data = cur.fetchall()
 
     cur.close()
@@ -707,18 +714,18 @@ def ListArd():
 @app.route('/updateArd/<id>', methods=['POST'])
 def updateArd(id):
     if request.method == 'POST':
-        ard = request.form['txtArd']
+        ard = request.form['txtMot']
         #state = request.form['state']
         
         cur = mysql.connection.cursor()
-        cur.execute('Select arduino from arduinos where arduino = %s',(ard,))
+        cur.execute('Select arduino from tipo_arduino where arduino = %s',(ard,))
         busquedaCC = cur.fetchone()
-        cur.execute('Select arduino from arduinos where idarduinos = %s',(id,))
+        cur.execute('Select arduino from tipo_arduino where idarduinos = %s',(id,))
         repe = cur.fetchone()
         cur.execute("""SELECT idarduinos,arduino,
                     Case when estado = 0 then 'Habilitado' When estado = 1 then 'Deshabilitado' 
                     End as status
-                    FROM arduinos""")
+                    FROM tipo_arduino""")
         data = cur.fetchall()
         cur.close()
     
@@ -741,7 +748,7 @@ def updateArd(id):
         else:
             cur=mysql.connection.cursor()
             cur.execute("""
-                UPDATE arduinos
+                UPDATE tipo_arduino
                 SET arduino = %s
                     
                 WHERE idarduinos= %s
@@ -755,7 +762,7 @@ def deleteArd(id):
     
     try:
         cur=mysql.connection.cursor()
-        cur.execute('DELETE FROM arduinos WHERE idarduinos = {0}'.format(id))
+        cur.execute('DELETE FROM tipo_arduino WHERE idarduinos = {0}'.format(id))
         mysql.connection.commit()
         cur.close()
         flash('Arduino eliminado exitosamente','success')
@@ -781,7 +788,7 @@ def addArd():
     cur.execute("""SELECT idarduinos,arduino,
                     Case when estado = 0 then 'Habilitado' When estado = 1 then 'Deshabilitado' 
                     End as status
-                    FROM arduinos""")
+                    FROM tipo_arduino""")
     data = cur.fetchall()
     cur.close()
     
@@ -808,19 +815,154 @@ def addArd():
 def InhaArd(id): 
     try:
         cur=mysql.connection.cursor()
-        cur.execute('Update arduinos  set estado = 1 WHERE idarduinos = {0}'.format(id))
+        cur.execute('Update tipo_arduino  set estado = 1 WHERE idarduinos = {0}'.format(id))
         mysql.connection.commit()
         cur.close()
         flash('Arduino inhabilitado exitosamente', 'success')
         return redirect(url_for('ListArd'))
     except Exception  as e:
         if '1451' in str(e):
-            flash('No se puede eliminar el Arduino porque está relacionado con otros registros.', 'warning')
+            flash('No se puede inhabilitar el Arduino porque está relacionado con otros registros.', 'warning')
         else:
-            flash('Error al eliminar el Arduino: {}'.format(str(e)), 'warning')
+            flash('Error al inhabilitar el Arduino: {}'.format(str(e)), 'warning')
     finally:
         cur.close()
     return redirect(url_for('ListArd'))
+
+
+#Metodos para motor
+#Listar
+@app.route('/listar-mot')
+def ListMotor():
+    cur=mysql.connection.cursor()
+
+    cur.execute("""SELECT idtipo_motor,tipo_motor,
+                    Case when estado = 0 then 'Habilitado' When estado = 1 then 'Deshabilitado' 
+                    End as status
+                    FROM tipo_motor""")
+    data = cur.fetchall()
+
+    cur.close()
+    return render_template('motores/list_motores.html', mot = data)
+#Actualizar
+@app.route('/updateMot/<id>', methods=['POST'])
+def updateMot(id):
+    if request.method == 'POST':
+        mot = request.form['txtMot']
+        #state = request.form['state']
+        
+        cur = mysql.connection.cursor()
+        cur.execute('Select tipo_motor from tipo_motor where tipo_motor = %s',(mot,))
+        busquedaCC = cur.fetchone()
+        cur.execute('Select tipo_motor from tipo_motor where idtipo_motor = %s',(id,))
+        repe = cur.fetchone()
+        cur.execute("""SELECT idtipo_motor,tipo_motor,
+                    Case when estado = 0 then 'Habilitado' When estado = 1 then 'Deshabilitado' 
+                    End as status
+                    FROM tipo_motor""")
+        data = cur.fetchall()
+        cur.close()
+    
+        if not validar_espacios(mot):
+            flash('Por favor ingrese un motor valido','danger')
+            return render_template('motores/list_motores.html', mot = data, motErrEdit=True, edit_modal=id)   
+        
+        # if  mot == '':
+        #     flash('Por favor ingrese un motor valido','danger')
+        #     return redirect(url_for('ListArd'))
+        
+        if busquedaCC:
+            if repe['tipo_motor'] == mot:
+                flash('Motor sin cambios detectados', 'success')
+                return redirect(url_for('ListMotor'))
+            elif busquedaCC['tipo_motor']:
+                flash(f'El motor {mot} ya se encuentra creado', 'danger')
+                return render_template('motores/list_motores.html', mot = data, dupliErrEdit=True, edit_modal=id)     
+
+        else:
+            cur=mysql.connection.cursor()
+            cur.execute("""
+                UPDATE tipo_motor
+                SET tipo_motor = %s
+                    
+                WHERE idtipo_motor= %s
+            """, (mot,  id))
+        mysql.connection.commit()
+        flash('Motor actualizado exitosamente','success')
+        return redirect(url_for('ListMotor'))
+#Eliminar
+@app.route('/deleteMot/<string:id>', methods = ['POST','GET'])
+def deleteMot(id): 
+    
+    try:
+        cur=mysql.connection.cursor()
+        cur.execute('DELETE FROM tipo_motor WHERE idtipo_motor = {0}'.format(id))
+        mysql.connection.commit()
+        cur.close()
+        flash('Motor eliminado exitosamente','success')
+        return redirect(url_for('ListMotor'))
+    
+    except Exception  as e:
+        if '1451' in str(e):
+            flash('No se puede eliminar el motor porque está relacionado con otros registros.', 'warning')
+        else:
+            flash('Error al eliminar el motor: {}'.format(str(e)), 'warning')
+    finally:
+        cur.close()
+    return redirect(url_for('ListMotor'))
+#Agregar
+@app.route('/add-mot', methods=["POST","GET"])
+def addMot():
+    mot = request.form['txtMot']
+    state = request.form['state']
+    
+    cur = mysql.connection.cursor()
+    cur.execute('Select tipo_motor from tipo_motor where tipo_motor = %s',(mot,))
+    busquedaCC = cur.fetchone()
+    cur.execute("""SELECT idtipo_motor,tipo_motor,
+                    Case when estado = 0 then 'Habilitado' When estado = 1 then 'Deshabilitado' 
+                    End as status
+                    FROM tipo_motor""")
+    data = cur.fetchall()
+    cur.close()
+    
+    if not validar_espacios(mot):
+        flash('Por favor ingrese un motor valido','danger')
+        return render_template('motores/list_motores.html', mot = data, motErr=True, add_modal=True, motTxt= mot)
+    
+    if  busquedaCC: 
+        flash(f'El motor {mot} ya se encuentra creado', 'danger')
+        return render_template('motores/list_motores.html', mot = data, dupliErr=True, add_modal=True, motTxt= mot)
+    else:
+
+        try:
+            cur = mysql.connection.cursor()
+            cur.execute("INSERT INTO tipo_motor (tipo_motor, estado) VALUES (%s, %s)", (mot, state))
+            mysql.connection.commit()
+            flash('Motor agregado con exito','success')
+            return redirect(url_for('ListMotor'))
+        except Exception as e:
+            flash('Error al agregar el motor','danger')
+            return redirect(url_for('ListMotor'))
+#Inhabilitar
+@app.route('/InhabilMot/<string:id>', methods = ['POST','GET'])
+def InhaMot(id): 
+    try:
+        cur=mysql.connection.cursor()
+        cur.execute('Update tipo_motor  set estado = 1 WHERE idtipo_motor = {0}'.format(id))
+        mysql.connection.commit()
+        cur.close()
+        flash('Motor inhabilitado exitosamente', 'success')
+        return redirect(url_for('ListMotor'))
+    except Exception  as e:
+        if '1451' in str(e):
+            flash('No se puede inhabilitar el motor porque está relacionado con otros registros.', 'warning')
+        else:
+            flash('Error al inhabilitar el motor: {}'.format(str(e)), 'warning')
+    finally:
+        cur.close()
+    return redirect(url_for('ListMotor'))
+
 
 
 #Metodos para tipo_cliente
@@ -1535,22 +1677,26 @@ def InhaCliente(id):
 def ListDispo():
     cur=mysql.connection.cursor()
     
-    cur.execute(""" select 
-                d.iddispositivo, d.nombre, ac.accesorios, ar.arduino,
-                Case when d.estado = 0 then 'Habilitado' When d.estado = 1 then 'Deshabilitado' 
+    cur.execute(""" select
+                d.iddispositivo, d.nombre, ac.accesorios, ar.arduino, tm.tipo_motor,
+                Case when d.estado = 0 then 'Habilitado' When d.estado = 1 then 'Deshabilitado'
                 End as status
                 from dispositivos d
-                inner join arduinos ar on ar.idarduinos = d.idarduino
-                inner join accesorios ac on ac.idaccesorios = d.idaccesorio""")
+                inner join tipo_arduino ar on ar.idarduinos = d.idarduino
+                inner join tipo_sensor ac on ac.idaccesorios = d.idaccesorio
+                inner join prueba.tipo_motor tm on d.idmotor = tm.idtipo_motor""")
     data = cur.fetchall()
     
-    cur.execute('SELECT idarduinos, arduino FROM arduinos ')
+    cur.execute('SELECT idarduinos, arduino FROM tipo_arduino ')
     dataOpt = cur.fetchall()
-    cur.execute('SELECT idaccesorios, accesorios FROM accesorios ')
+    cur.execute('SELECT idaccesorios, accesorios FROM tipo_sensor ')
     dataOpt2 = cur.fetchall()
+    cur.execute('SELECT idtipo_motor, tipo_motor FROM tipo_motor ')
+    dataOpt3 = cur.fetchall()
+    
     
     cur.close()
-    return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt= dataOpt, dataOpt2= dataOpt2)
+    return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt= dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3)
 #Agregar
 @app.route('/add-dispo', methods=["POST","GET"])
 def addDispo():
@@ -1559,55 +1705,64 @@ def addDispo():
     acce= request.form['accesorio']
     ardui= request.form['arduino']
     state = request.form['state']
+    mot = request.form['motor']
     #print(nam1)
     cur = mysql.connection.cursor()
     cur.execute('Select * from dispositivos where nombre = %s',(disp,))
     busquedaCC = cur.fetchone()
-    cur.execute(""" select 
-                d.iddispositivo, d.nombre, ac.accesorios, ar.arduino,
-                Case when d.estado = 0 then 'Habilitado' When d.estado = 1 then 'Deshabilitado' 
+    cur.execute(""" select
+                d.iddispositivo, d.nombre, ac.accesorios, ar.arduino, tm.tipo_motor,
+                Case when d.estado = 0 then 'Habilitado' When d.estado = 1 then 'Deshabilitado'
                 End as status
                 from dispositivos d
-                inner join arduinos ar on ar.idarduinos = d.idarduino
-                inner join accesorios ac on ac.idaccesorios = d.idaccesorio""")
+                inner join tipo_arduino ar on ar.idarduinos = d.idarduino
+                inner join tipo_sensor ac on ac.idaccesorios = d.idaccesorio
+                inner join prueba.tipo_motor tm on d.idmotor = tm.idtipo_motor""")
     data = cur.fetchall()
     
-    cur.execute('SELECT idarduinos, arduino FROM arduinos ')
+    cur.execute('SELECT idarduinos, arduino FROM tipo_arduino ')
     dataOpt = cur.fetchall()
-    cur.execute('SELECT idaccesorios, accesorios FROM accesorios ')
+    cur.execute('SELECT idaccesorios, accesorios FROM tipo_sensor ')
     dataOpt2 = cur.fetchall()
+    cur.execute('SELECT idtipo_motor, tipo_motor FROM tipo_motor ')
+    dataOpt3 = cur.fetchall()
     cur.close()
     
     if not validar_espacios(disp):
         flash('El dispositivo ingresado no es valido', 'danger')
-        return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dispErr=True, add_modal=True,
+        return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3,dispErr=True, add_modal=True,
         disp= disp)
         
     if acce == '':
         flash('Por favor ingrese un accesorio', 'danger')
-        return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, accErr=True, add_modal=True,
+        return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3,accErr=True, add_modal=True,
         disp= disp)
         
     if ardui == '':
         flash('Por favor ingrese un arduino', 'danger')
-        return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, arduiErr=True, add_modal=True,
+        return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3,arduiErr=True, add_modal=True,
+        disp= disp)
+        
+    if mot == '':
+        flash('Por favor ingrese un motor', 'danger')
+        return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3,motorErr=True, add_modal=True,
         disp= disp)
     
     
     if  busquedaCC: 
         flash(f'El dispositivo {disp} ya se encuentra creado', 'danger')
-        return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dupliErr=True, add_modal=True,
+        return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3,dupliErr=True, add_modal=True,
         disp= disp) 
     else:
         try:
             cur = mysql.connection.cursor()
-            cur.execute("INSERT INTO dispositivos (nombre, idaccesorio,idarduino,estado)values(%s,%s,%s,%s)",(disp,acce,ardui,state))
+            cur.execute("INSERT INTO dispositivos (nombre, idaccesorio,idarduino,idmotor,estado)values(%s,%s,%s,%s,%s)",(disp,acce,ardui,mot,state))
             mysql.connection.commit()
             cur.close()
             flash('Dispositivo agregado con exito', 'success')
             return redirect(url_for('ListDispo'))
         except Exception as e:
-            flash('Error al agregar el dispositivo: {}'.format(str(e)), 'danger')
+            flash('Error al agregar el dispositivo: {}'.format(str(e)), 'warning')
             return redirect(url_for('ListDispo'))
 #Actualizar
 @app.route('/updateDispo/<id>', methods=['POST'])
@@ -1617,37 +1772,45 @@ def updateDispo(id):
         disp = request.form['txtDispo']
         acce= request.form['accesorio']
         ardui= request.form['arduino']
+        mot= request.form['motor']
         #state = request.form['state']
         
         cur = mysql.connection.cursor()
         cur.execute("""select *  from dispositivos WHERE iddispositivo = %s""", (id,))
         repe = cur.fetchone()
-        cur.execute(""" select 
-                d.iddispositivo, d.nombre, ac.accesorios, ar.arduino,
-                Case when d.estado = 0 then 'Habilitado' When d.estado = 1 then 'Deshabilitado' 
+        cur.execute(""" select
+                d.iddispositivo, d.nombre, ac.accesorios, ar.arduino, tm.tipo_motor,
+                Case when d.estado = 0 then 'Habilitado' When d.estado = 1 then 'Deshabilitado'
                 End as status
                 from dispositivos d
-                inner join arduinos ar on ar.idarduinos = d.idarduino
-                inner join accesorios ac on ac.idaccesorios = d.idaccesorio""")
-        data = cur.fetchall() 
-        cur.execute('SELECT idarduinos, arduino FROM arduinos ')
+                inner join tipo_arduino ar on ar.idarduinos = d.idarduino
+                inner join tipo_sensor ac on ac.idaccesorios = d.idaccesorio
+                inner join prueba.tipo_motor tm on d.idmotor = tm.idtipo_motor""")
+        data = cur.fetchall()
+        
+        cur.execute('SELECT idarduinos, arduino FROM tipo_arduino ')
         dataOpt = cur.fetchall()
-        cur.execute('SELECT idaccesorios, accesorios FROM accesorios ')
+        cur.execute('SELECT idaccesorios, accesorios FROM tipo_sensor ')
         dataOpt2 = cur.fetchall()
+        cur.execute('SELECT idtipo_motor, tipo_motor FROM tipo_motor ')
+        dataOpt3 = cur.fetchall()
         cur.close()
         
         if not validar_espacios(disp):
             flash('El dispositivo ingresado no es valido', 'danger')
-            return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dispErrEdit=True, edit_modal=id)
+            return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3,dispErrEdit=True, edit_modal=id)
             
         if acce == '':
             flash('Por favor ingrese un accesorio', 'danger')
-            return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, accErrEdit=True, edit_modal=id)
+            return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3,accErrEdit=True, edit_modal=id)
             
         if ardui == '':
             flash('Por favor ingrese un arduino', 'danger')
-            return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, arduiErrEdit=True, edit_modal=id)
+            return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3,arduiErrEdit=True, edit_modal=id)
         
+        if mot == '':
+            flash('Por favor ingrese un motor', 'danger')
+            return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3,motorErr=True, edit_modal=id)
         
         if repe['nombre'] != disp:
             cur = mysql.connection.cursor()
@@ -1664,10 +1827,11 @@ def updateDispo(id):
             UPDATE dispositivos
             SET nombre = %s,
                 idaccesorio = %s,
-                idarduino = %s
+                idarduino = %s,
+                idmotor = %s
             
             WHERE iddispositivo= %s
-        """, (disp,acce,ardui,  id))
+        """, (disp,acce,ardui,mot,  id))
         mysql.connection.commit()
         cur.close()
         flash('Dispositivo actualizado exitosamente', 'success')

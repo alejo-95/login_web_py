@@ -96,6 +96,23 @@
                             {%endwith%}
                         </div>
                         <div class="form-group mb-4 modalForm">
+                            <label for="exampleInputPassword1">Motor</label>
+                            <select name="motor" class="form-control" title="option">
+                                <option value="">Seleccionar...</option>
+                                {% for opcion in dataOpt3 %}
+                                <option value="{{ opcion.idtipo_motor }}">{{ opcion.tipo_motor }}</option>
+                                {% endfor %}
+                            </select>
+                            {%with messages = get_flashed_messages(with_categories=true)%}
+                            {%if messages and motorErr%}
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
+                                {{message}}</div>
+                            {%endfor%}
+                            {%endif%}
+                            {%endwith%}
+                        </div>
+                        <div class="form-group mb-4 modalForm">
                             <label for="exampleInputPassword1">Estado</label>
                             <select name="state" class="form-control" title="option2">
                                 <option value="0">Habilitado</option>
@@ -125,10 +142,12 @@
             </h3>
         </div>
 
+        {% if 'idperfil' in session and session['idperfil'] == 1 %}
         <div>
             <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#userModal"> Nuevo
                 dispositivo</button>
         </div>
+        {%endif%}
 
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -151,8 +170,11 @@
                     <th>Nombre</th>
                     <th>Accesorio</th>
                     <th>Arduino</th>
+                    <th>Motor</th>
                     <th>Estado</th>
+                    {% if 'idperfil' in session and session['idperfil'] == 1 %}
                     <th>Acción</th>
+                    {%endif%}
                 </tr>
             </thead>
             <tbody>
@@ -162,7 +184,9 @@
                     <td>{{data.nombre}}</td>
                     <td>{{data.accesorios}}</td>
                     <td>{{data.arduino}}</td>
+                    <td>{{data.tipo_motor}}</td>
                     <td>{{data.status}}</td>
+                    {% if 'idperfil' in session and session['idperfil'] == 1 %}
                     <td class="text-center">
                         <a href="/updateDispo/{{data.iddispositivo}}" class="bi-pencil-fill edit_action" title="edit"
                             data-bs-toggle="modal" data-bs-target="#edit{{data.iddispositivo}}"></a>
@@ -171,6 +195,7 @@
                         <a href="/deleteDispo/{{data.iddispositivo}}" class="bi-eraser-fill btn-delete"
                             title="delete"></a>
                     </td>
+                    {%endif%}
                 </tr>
 
                 <!-- Edicion -->
@@ -237,6 +262,23 @@
                                         {% for category, message in messages %}
                                         <div class="alert alert-{{category}} alert-dismissible fade show mt-3"
                                             role="alert">{{message}}</div>
+                                        {%endfor%}
+                                        {%endif%}
+                                        {%endwith%}
+                                    </div>
+                                    <div class="form-group mb-4 modalForm">
+                                        <label for="exampleInputPassword1">Motor</label>
+                                        <select name="motor" class="form-control" title="option">
+                                            <option value="">Seleccionar...</option>
+                                            {% for opcion in dataOpt3 %}
+                                            <option value="{{ opcion.idtipo_motor }}">{{ opcion.tipo_motor }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        {%with messages = get_flashed_messages(with_categories=true)%}
+                                        {%if messages and motorErr%}
+                                        {% for category, message in messages %}
+                                        <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
+                                            {{message}}</div>
                                         {%endfor%}
                                         {%endif%}
                                         {%endwith%}

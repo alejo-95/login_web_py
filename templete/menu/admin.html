@@ -17,16 +17,19 @@
             <ul>
                 <li><a href="#">Clientes</a>
                     <ul>
-                        <!-- <li><a href="/user">Crear Usuario</a></li> -->
                         <li><a href="/listar-clientes">Gestionar Clientes</a></li>
+                        {% if 'idperfil' in session and session['idperfil'] == 1 %}
                         <li><a href="/listar-tipClient">Gestionar Tipo Cliente</a></li>
+                        {%endif%}
                     </ul>
                 </li>
                 <li><a href="#">Invernaderos</a>
                     <ul>
                         <li><a href="/listar-invernaderos">Gestionar Invernadero</a></li>
+                        {% if 'idperfil' in session and session['idperfil'] == 1 %}
                         <li><a href="/listar-tipInve">Gestionar Tipo Invernadero</a></li>
                         <li><a href="/listar-tamanio">Gestionar Tamaños de Invernadero</a></li>
+                        {%endif%}
                         <li><a href="/listar-cultivos">Gestionar Cultivos</a></li>
                     </ul>
                 </li>
@@ -37,81 +40,24 @@
                 <li><a href="#">Dispositivos</a>
                     <ul>
                         <li><a href="/listar-dispositivos">Gestionar Dispositivos</a></li>
+                        {% if 'idperfil' in session and session['idperfil'] == 1 %}
                         <li><a href="/listar-ard">Gestionar Arduinos</a></li>
-                        <li><a href="/listar-acce">Gestionar Accesorios</a></li>
+                        <li><a href="/listar-acce">Gestionar Sensores</a></li>
+                        <li><a href="/listar-mot">Gestionar Motores</a></li>
+                        {%endif%}
                     </ul>
                 </li>
-                <li><a href="#">Configuración</a>
+                <li>
+                    <a href="#">Configuración</a>
                     <ul>
-                        <li><a href="/listar-usuarios">Gestionar Usuarios</a></li>
+                        <li id="user"><a href="/listar-usuarios">Gestionar Usuarios</a></li>
+                        {% if 'idperfil' in session and session['idperfil'] == 1 %}
                         <li><a href="/listar-perfiles">Gestionar Perfiles</a></li>
+                        {%endif%}
                     </ul>
                 </li>
                 <li><a href="/logout">Salir</a>
                 </li>
-                <!-- <li><a href="#">Empleado</a>
-                    <ul>
-                        <li><a href="Employed.html">Gestión empleado</a></li>
-                    </ul>
-                </li>
-                <li><a href="#">Vehículo</a>
-                    <ul>
-                        <li><a href="Vehicle.html">Gestión vehículo</a></li>
-                        <li><a href="Typevehicle.html">Gestión tipo Vehículo</a></li>
-                        <li><a href="Mark.html">Gestión marca</a></li>
-                    </ul>
-                </li>
-
-                <li><a href="#">Anotación +</a>
-                    <ul>
-                        <li><a href="#">Anotación</a></li>
-                        <li><a href="#">Anotación +</a>
-                            <ul>
-                                <li><a href="#">Anotación</a></li>
-                                <li><a href="#">Anotación</a></li>
-                                <li><a href="#">Anotación</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li> -->
-
-                <!-- <li><a href="#">Dispositivo</a>
-                    <ul>
-                        <li><a href="Device.html">Gestión dispositivo</a></li>
-                        <li><a href="TypeDevice.html">Gestión tipo dispositivo</a></li>
-                        <li><a href="warranty.html">Gestión garantías</a></li>
-                        <li><a href="Provider.html">Gestión proveedor</a></li>
-                    </ul>
-                </li>
-
-                <li><a href="#">Documentación</a>
-                    <ul>
-                        <li><a href="#">Informes</a>
-                            <ul>
-                                <li><a href="#">Efectividad OS</a></li>
-                                <li><a href="#">OS Finalizadas</a></li>
-                                <li><a href="#">Rendimiento Operadores</a></li>
-                            </ul>
-                        </li>
-
-                        <li><a href="#">Consultas</a>
-                            <ul>
-                                <li><a href="">Cantidad OS creadas por mes</a></li>
-                                <li><a href="">Cantidad OS creadas por operador</a></li>
-                                <li><a href="">Cantidad OS creadas por país</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-
-                <li><a href="#">Configuración</a>
-                    <ul>
-                        <li><a href="User.html">Gestión Usuario</a></li>
-                        <li><a href="Profile.html">Gestión Perfil</a></li>
-                        <li><a href="Country.html">Gestión País</a></li>
-                        <li><a href="City.html">Gestión Ciudad</a></li>
-                    </ul>
-                </li>-->
             </ul>
         </nav>
     </header>

@@ -179,10 +179,12 @@
             </h3>
         </div>
 
+        {% if 'idperfil' in session and session['idperfil'] == 1 %}
         <div>
             <button class="btn btn-outline-success" data-bs-toggle="modal"
                     data-bs-target="#userModal"> Nuevo cliente</button>
         </div>
+        {%endif%}
 
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -211,7 +213,9 @@
                     <th>Correo</th>
                     <th>Tipo</th>
                     <th>Estado</th>
+                    {% if 'idperfil' in session and session['idperfil'] == 1 %}
                     <th>Acción</th>
+                    {%endif%}
                 </tr>
             </thead>
             <tbody>
@@ -227,12 +231,14 @@
                     <td>{{data.correo}}</td>
                     <td>{{data.tipo}}</td>
                     <td>{{data.status}}</td>
+                    {% if 'idperfil' in session and session['idperfil'] == 1 %}
                     <td class="text-center">
                         <a href="/updateCliente/{{data.idclientes}}" class="bi-pencil-fill edit_action" title="editar"
                             data-bs-toggle="modal" data-bs-target="#edit{{data.idclientes}}"></a>
                         <a href="/InhabilCliente/{{data.idclientes}}" class="bi bi-ban btn-inhabi" title="Inhabilitar"></a>
                         <a href="/deleteCliente/{{data.idclientes}}" class="bi-eraser-fill btn-delete" title="Borrar"></a>
                     </td>
+                    {%endif%}
                 </tr>
 
                 <!-- Edicion -->

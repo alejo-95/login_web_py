@@ -176,10 +176,12 @@
             </h3>
         </div>
 
+        {% if 'idperfil' in session and session['idperfil'] == 1 %}
         <div>
             <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#userModal"> Nuevo
                 invernadero</button>
         </div>
+        {%endif%}
 
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -206,7 +208,9 @@
                     <th>Cédula</th>
                     <th>Tipo inveradero</th>
                     <th>Estado</th>
+                    {% if 'idperfil' in session and session['idperfil'] == 1 %}
                     <th>Acción</th>
+                    {%endif%}
                 </tr>
             </thead>
             <tbody>
@@ -220,6 +224,7 @@
                     <td>{{data.cedula}}</td>
                     <td>{{data.tipo_invernadero}}</td>
                     <td>{{data.status}}</td>
+                    {% if 'idperfil' in session and session['idperfil'] == 1 %}
                     <td class="text-center">
                         <a href="/updateInverna/{{data.idinvernaderos}}" class="bi-pencil-fill edit_action"
                             title="editar" data-bs-toggle="modal" data-bs-target="#edit{{data.idinvernaderos}}"></a>
@@ -228,6 +233,7 @@
                         <a href="/deleteInverna/{{data.idinvernaderos}}" class="bi-eraser-fill btn-delete"
                             title="Eliminar"></a>
                     </td>
+                    {%endif%}
                 </tr>
 
                 <!-- Edicion -->

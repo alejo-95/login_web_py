@@ -19,6 +19,10 @@
     <script src="https://cdn.datatables.net/2.0.3/js/dataTables.bootstrap5.js"></script>
     <script src="../../static/script.js"></script>
 
+    <script src="https://cdn.datatables.net/buttons/3.0.2/js/dataTables.buttons.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables-buttons/3.0.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 
     <title>Termocultiva</title>
 </head>
@@ -31,16 +35,15 @@
 
                 <div class="modal-header">
                     <h5 class="modal-title text-primary new_title">
-                        Por favor cree un nuevo cultivo
+                        Por favor cree un nuevo motor
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" title="exit">
                     </button>
                 </div>
 
 
-                <form action="/add-cult" method="POST">
+                <form action="/add-mot" method="POST">
                     <div class="modal-body" class="form-control form-login-register">
-
                         {%with messages = get_flashed_messages(with_categories=true)%}
                         {%if messages and dupliErr%}
                         {% for category, message in messages %}
@@ -49,38 +52,13 @@
                         {%endfor%}
                         {%endif%}
                         {%endwith%}
+
                         <div class="form-group mb-3 modalForm">
-                            <label for="exampleInputEmail1">Cultivo</label>
-                            <input type="text" class="form-control" id="cultivo1" aria-describedby="emailHelp"
-                                placeholder="Ingrese el cultivo" name="txtCulti" value="{{cul}}">
+                            <label for="exampleInputEmail1">Motor</label>
+                            <input type="text" class="form-control" id="usertxt" aria-describedby="emailHelp"
+                                placeholder="Ingrese el motor" name="txtMot" value="{{motTxt}}">
                             {%with messages = get_flashed_messages(with_categories=true)%}
-                            {%if messages and culErr%}
-                            {% for category, message in messages %}
-                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
-                                {{message}}</div>
-                            {%endfor%}
-                            {%endif%}
-                            {%endwith%}
-                        </div>
-                        <div class="form-group mb-3 modalForm">
-                            <label for="exampleInputEmail1">Temperatura minima</label>
-                            <input type="text" class="form-control" id="temp_min1" aria-describedby="emailHelp"
-                                placeholder="Ingrese la temperatura minima" name="txtTempMin" value="{{temMin}}">
-                            {%with messages = get_flashed_messages(with_categories=true)%}
-                            {%if messages and temMinErr%}
-                            {% for category, message in messages %}
-                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
-                                {{message}}</div>
-                            {%endfor%}
-                            {%endif%}
-                            {%endwith%}
-                        </div>
-                        <div class="form-group mb-3 modalForm">
-                            <label for="exampleInputEmail1">Temperatura maxima</label>
-                            <input type="text" class="form-control" id="temp_max1" aria-describedby="emailHelp"
-                                placeholder="Ingrese la temperatura maxima" name="txtTempMax" value="{{temMax}}">
-                            {%with messages = get_flashed_messages(with_categories=true)%}
-                            {%if messages and temMaxErr%}
+                            {%if messages and motErr%}
                             {% for category, message in messages %}
                             <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
                                 {{message}}</div>
@@ -113,16 +91,14 @@
 
         <div>
             <h3 class="text-center title_module">
-                Gestión Cultivos
+                Gestión motor
             </h3>
         </div>
-        
-        {% if 'idperfil' in session and session['idperfil'] == 1 %}
+
         <div>
             <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#perfilModal"> Nuevo
-                Cultivo</button>
+                motor</button>
         </div>
-        {%endif%}
 
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -142,97 +118,55 @@
             <thead>
                 <tr class="table_u ">
                     <th>ID</th>
-                    <th>Cultivo</th>
-                    <th>Temeperatura minima</th>
-                    <th>Temeperatura maxima</th>
+                    <th>Motor</th>
                     <th>Estado</th>
-                    {% if 'idperfil' in session and session['idperfil'] == 1 %}
                     <th>Acción</th>
-                    {%endif%}
                 </tr>
             </thead>
             <tbody>
-                {% for data in temp %}
+                {% for data in mot %}
                 <tr>
-                    <td>{{data.idcultivos}}</th>
-                    <td>{{data.cultivo}}</td>
-                    <td>{{data.temp_min}}</td>
-                    <td>{{data.temp_max}}</td>
+                    <td>{{data.idtipo_motor}}</th>
+                    <td>{{data.tipo_motor}}</td>
                     <td>{{data.status}}</td>
-                    {% if 'idperfil' in session and session['idperfil'] == 1 %}
                     <td class="text-center">
-                        <a href="/updateCultivo/{{data.idcultivos}}" class="bi-pencil-fill edit_action" title="edit"
-                            data-bs-toggle="modal" data-bs-target="#editModal{{data.idcultivos}}"></a>
-                        <a href="/InhabilCultivo/{{data.idcultivos}}" class="bi bi-ban btn-inhabi"
-                            title="Inhabilitar"></a>
-                        <a href="/deleteCultivo/{{data.idcultivos}}" class="bi-eraser-fill btn-delete"
-                            title="delete"></a>
+                        <a href="/updateMot/{{data.idtipo_motor}}" class="bi-pencil-fill edit_action" title="editar"
+                            data-bs-toggle="modal" data-bs-target="#editModal{{data.idtipo_motor}}"></a>
+                        <a href="/InhabilMot/{{data.idtipo_motor}}" class="bi bi-ban btn-inhabi" title="Inhabilitar"></a>
+                        <a href="/deleteMot/{{data.idtipo_motor}}" class="bi-eraser-fill btn-delete" title="eliminar"></a>
                     </td>
-                    {%endif%}
                 </tr>
 
                 <!-- Edicion -->
-                <div class="modal fade" id="editModal{{data.idcultivos}}" data-bs-backdrop="static" role="dialog">
+                <div class="modal fade" id="editModal{{data.idtipo_motor}}" data-bs-backdrop="static" role="dialog">
                     <div class="modal-dialog modal-dialog-scrollable">
 
                         <div class="modal-content">
 
                             <div class="modal-header">
-                                <h5>Editar tamaño de invernadero</h5>
+                                <h5>Editar Motor</h5>
                                 <button class="btn-close" data-bs-dismiss="modal" title="exit"></button>
                             </div>
-                            <form action="/updateCultivo/{{data.idcultivos}}" method="POST">
+                            <form action="/updateMot/{{data.idtipo_motor}}" method="POST">
                                 <div class="modal-body" class="form-control form-login-register">
                                     {%with messages = get_flashed_messages(with_categories=true)%}
                                     {%if messages and dupliErrEdit%}
                                     {% for category, message in messages %}
                                     <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
-                                        {{message}}
-                                    </div>
+                                        {{message}}</div>
                                     {%endfor%}
                                     {%endif%}
                                     {%endwith%}
                                     <div class="form-group mb-3 modalForm">
-                                        <label for="exampleInputEmail1">Cultivo</label>
-                                        <input type="text" class="form-control" id="cultivo"
-                                            aria-describedby="emailHelp" placeholder="Ingrese el tamaño" name="txtCulti"
-                                            value="{{data.cultivo}}">
+                                        <label for="exampleInputEmail1">Motor</label>
+                                        <input type="text" class="form-control" id="exampleInputEmail1"
+                                            aria-describedby="emailHelp" placeholder="Ingrese Motor" name="txtMot"
+                                            value="{{data.tipo_motor}}">
                                         {%with messages = get_flashed_messages(with_categories=true)%}
-                                        {%if messages and culErrEdit%}
+                                        {%if messages and ardErrEdit%}
                                         {% for category, message in messages %}
                                         <div class="alert alert-{{category}} alert-dismissible fade show mt-3"
-                                            role="alert">{{message}}
-                                        </div>
-                                        {%endfor%}
-                                        {%endif%}
-                                        {%endwith%}
-                                    </div>
-                                    <div class="form-group mb-3 modalForm">
-                                        <label for="exampleInputEmail1">Temperatura minima</label>
-                                        <input type="text" class="form-control" id="temp_min"
-                                            aria-describedby="emailHelp" placeholder="Ingrese el tamaño"
-                                            name="txtTempMin" value="{{data.temp_min}}">
-                                        {%with messages = get_flashed_messages(with_categories=true)%}
-                                        {%if messages and temMinErrEdit%}
-                                        {% for category, message in messages %}
-                                        <div class="alert alert-{{category}} alert-dismissible fade show mt-3"
-                                            role="alert">{{message}}
-                                        </div>
-                                        {%endfor%}
-                                        {%endif%}
-                                        {%endwith%}
-                                    </div>
-                                    <div class="form-group mb-3 modalForm">
-                                        <label for="exampleInputEmail1">Temperatura maxima</label>
-                                        <input type="text" class="form-control" id="temp_max"
-                                            aria-describedby="emailHelp" placeholder="Ingrese el tamaño"
-                                            name="txtTempMax" value="{{data.temp_max}}">
-                                        {%with messages = get_flashed_messages(with_categories=true)%}
-                                        {%if messages and temMaxErrEdit%}
-                                        {% for category, message in messages %}
-                                        <div class="alert alert-{{category}} alert-dismissible fade show mt-3"
-                                            role="alert">{{message}}
-                                        </div>
+                                            role="alert">{{message}}</div>
                                         {%endfor%}
                                         {%endif%}
                                         {%endwith%}
