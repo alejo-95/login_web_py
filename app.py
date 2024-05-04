@@ -50,13 +50,14 @@ def login():
             session['idperfil'] = account['idperfil']
             
             if session['idperfil'] == 1:
-                return render_template("inde.html")
+                return render_template("menu/admin.html")
             elif session['idperfil'] == 2:
                 return render_template('menu/admin.html')
         
         else:
-            return render_template('index.html',mensaje='El usuario y/o la contraseña son incorrectos')
-        
+            return render_template('index.html',mensaje='El usuario y/o la contraseña son incorrectos')    
+
+#Salir
 @app.route('/logout')
 def logout():
     #Remover el nombre de usuario de la sesión si está presente
@@ -64,36 +65,217 @@ def logout():
     session.clear()
     return redirect(url_for('home'))
 
+#Renderiza vista registro
 @app.route('/registro')
+def initRegister():
+    cur=mysql.connection.cursor()
+    cur.execute('SELECT idtipo_clientes, tipo FROM tipo_clientes ')
+    dataOpt = cur.fetchall()
+    cur.close()
+    return render_template('login_register/registro.html', cliente=True, dataOpt= dataOpt)
+#Crear Cliente registro
+@app.route('/crear_registro', methods=["GET", "POST"])
 def registro():
-    return render_template('Login_register/registro.html')
+    print(request.form)
+    
+    nam1 = request.form['txtName1']
+    nam2= request.form['txtName2']
+    ape1= request.form['txtAp1']
+    ape2 = request.form['txtAp2']
+    cc = request.form['txtCc']
+    tel = request.form['txtTel']
+    mail = request.form['txtMail']
+    tipe = request.form['tipoPersona']
+    state = request.form['state']
+    #print(cc)
+    cur=mysql.connection.cursor()
+    cur.execute(""" select 
+                c.idclientes, c.nombre_1, c.nombre_2, c.apellido_1, c.apellido_2, 
+                c.cedula, c.telefono, c.correo, tc.tipo, Case when c.estado = 0 then 'Habilitado' When c.estado = 1 then 'Deshabilitado' 
+                End as status
+                from clientes c
+                inner join tipo_clientes tc on c.tipo_cliente = tc.idtipo_clientes""")
+    data = cur.fetchall()
+    cur.execute('SELECT idtipo_clientes, tipo FROM tipo_clientes ')
+    dataOpt = cur.fetchall()
+    cur.close()
+    
+    if not validar_cc(cc):
+        flash('La cédula ingresada no es valida', 'danger')
+        return render_template('login_register/registro.html',client = data, ccErr=True,dataOpt=dataOpt, add_modal=True,
+        cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail)
+    
+    if not validar_nombre(nam1):
+        flash('El nombre ingresado no es valido', 'danger')
+        return render_template('login_register/registro.html',client = data, nam1Err=True,dataOpt=dataOpt, add_modal=True,
+        cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail)
+        #return redirect(url_for('ListClient'))
+    
+    if nam2 != '':
+        if not validar_nombre(nam2):
+            flash('El segundo nombre ingresado no es valido', 'danger')
+            return render_template('login_register/registro.html',client = data, nam2Err=True,dataOpt=dataOpt, add_modal=True,
+            cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail)
+            #return redirect(url_for('ListClient'))
+        
+    if not validar_nombre(ape1):
+        flash('El apellido ingresado no es valido', 'danger')
+        return render_template('login_register/registro.html',client = data, ape1Err=True,dataOpt=dataOpt, add_modal=True,
+        cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail)
+        #return redirect(url_for('ListClient'))
+    
+    if nam2 != '':
+        if not validar_nombre(ape2):
+            flash('El segundo apellido ingresado no es valido', 'danger')
+            return render_template('login_register/registro.html',client = data, ape2Err=True,dataOpt=dataOpt, add_modal=True,
+            cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail)
+            #return redirect(url_for('ListClient'))
+        
+    if not validar_celular(tel):
+        flash('El celular ingresado no es valido', 'danger')
+        return render_template('login_register/registro.html',client = data, telErr=True,dataOpt=dataOpt, add_modal=True,
+        cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail)
+        #return redirect(url_for('ListClient'))
+    
+    if not validar_correo(mail):
+        flash('El correo inrgesado es incorrecto', 'danger')
+        return render_template('login_register/registro.html',client = data, mailErr=True,dataOpt=dataOpt, add_modal=True,
+        cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail)
+        #return redirect(url_for('ListClient'))
+    
+    if nam1 == '' or ape1 == "" or cc == '' or tel == '' or mail =='' or tipe =='':
+        flash('Por favor ingrese un cliente valido', 'danger')
+        return render_template('login_register/registro.html',client = data, dupliErr=True,dataOpt=dataOpt, add_modal=True,
+        cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail)
+        #return redirect(url_for('ListClient'))
+    
+    if not cc =='':
+        cur = mysql.connection.cursor()
+        cur.execute('Select cedula from clientes where cedula = {0}'.format(cc))
+        busquedaCC = cur.fetchone()
+        cur.close()
+    
+    
+    if  busquedaCC: 
+        flash(f'El cliente con cédula {cc} ya se encuentra creado', 'danger')
+        #return redirect(url_for('ListClient'))
+        return render_template('login_register/registro.html',client = data, dupliErr=True,dataOpt=dataOpt, add_modal=True,
+        cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail)
+    else:
 
-
-@app.route('/create-registro', methods=["GET","POST"])
-def createRegister():
-    correo= request.form['txtCorreo']
-    password= request.form['txtPassword']
+        try:
+            cur = mysql.connection.cursor()
+            #cur.execute("INSERT INTO clientes (nombre_1, nombre_2,)values(%s,%s)",(nam1, nam2))
+            cur.execute("INSERT INTO clientes (nombre_1, nombre_2, apellido_1, apellido_2, cedula, telefono, correo, tipo_cliente, estado) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)", (nam1,nam2,ape1,ape2,cc,tel,mail,tipe,state))
+            mysql.connection.commit()
+            cur.close()
+            flash('Cliente agregado con exito, por favor cree el usuario', 'success')
+            return render_template('login_register/registro.html',dupliErr=True,usuario=True, cliente=False, cc=cc)
+        except mysql.connector.Error as e:
+            if e.errno == 1451:
+                flash('No se puede eliminar el cliente porque está relacionado con otros registros.', 'danger')
+            else:
+                flash('Error al agregar el cliente: {}'.format(str(e)), 'danger')
+            
+            return redirect(url_for('home'))
+    
+    #return render_template('Login_register/registro.html')
+#Crear usuario en registro
+@app.route('/create-registro/<id>', methods=["GET","POST"])
+def createRegister(id):
+    correo = request.form['txtCorreo']
+    password = request.form['txtPassword']
+    #perfil_id = request.form['perfil']
+    cliente = id
+    print(request.form, cliente)
     
     cur = mysql.connection.cursor()
     cur.execute('Select name from usuarios where name = %s',(correo,))
     busquedaCC = cur.fetchone()
+    cur.execute('SELECT u.id, u.name, u.password, p.perfiles FROM usuarios u inner join perfiles p on u.idperfil = p.idperfiles')
+    data = cur.fetchall() 
+    cur.execute('SELECT idperfiles, perfiles FROM perfiles ')
+    dataOpt = cur.fetchall()
     cur.close()
     
     if  busquedaCC: 
-        #flash(f'El usuario {correo} ya se encuentra creado', 'danger')
-        return render_template('Login_register/registro.html', registerWrong= f'El usuario {correo} ya se encuentra creado')
-    
+        flash(f'El usuario {correo} ya se encuentra creado', 'danger')
+        return render_template('login_register/registro.html', users = data, dataOpt= dataOpt, correo=correo, dupliErr= True, add_modal=True, usuario = True)
     
     if not validar_usuario(correo):
-        return render_template('Login_register/registro.html', registerWrong='Por favor ingrese un usuario valido')
-    elif password == '':
-        return render_template('Login_register/registro.html', registerWrong='Por favor ingrese un usuario valido')
-    else:
-        cur = mysql.connection.cursor()
-        cur.execute("Insert into usuarios(name,password, idperfil) values(%s,%s,'2')",(correo, password))
-        mysql.connection.commit()
-        return render_template('index.html',mensajeRegister ='El usuario ha sido registrado con exito')
+        flash('El usuario ingresado no es valido valido','danger')
+        return render_template('login_register/registro.html', users = data, dataOpt= dataOpt, correo=correo, correoErr= True, add_modal=True, usuario = True)
     
+    if  password == '':
+        flash('Por favor inrgese un usuario valido','danger')
+        return render_template('login_register/registro.html', users = data, dataOpt= dataOpt, correo=correo, contraErr= True, add_modal=True, usuario = True)
+    
+    # if perfil_id == '':
+    #     flash('Por favor inrgese un perfil valido','danger')
+    #     return render_template('login_register/registro.html', users = data, dataOpt= dataOpt, correo=correo, perfilErr= True, add_modal=True)
+    else:
+        try:
+            cur = mysql.connection.cursor()
+            cur.execute("INSERT INTO usuarios (name, password, idperfil, cliente) VALUES (%s, %s, 2,%s)", (correo, password, cliente,))
+            mysql.connection.commit()
+            cur.close()
+            flash('Usuario agregado con exito', 'success')
+            #return render_template('index.html')
+            return redirect(url_for('home'))
+        except Exception as e:
+            flash('Error al agregar un usuario', 'danger')
+            print(e)
+            return redirect(url_for('home'))
+
+
+#recuperar contraseña
+@app.route('/rec-contraseña')
+def ForgotPassword():
+    return render_template('Login_register/recu_contraseña.html')
+#Actualizar contraseña
+@app.route('/newPassword', methods=['POST', 'GET'])
+def NewPassword():
+    cc = request.form['txtCc']
+    user = request.form['txtCorreo']
+    pass1 = request.form['txtPassword']
+    pass2 = request.form['txtPassword2']
+    print(request.form)
+    print(cc)
+    
+    cur = mysql.connection.cursor()
+    cur.execute('Select cedula from clientes where cedula = %s',(cc,))
+    existeCC = cur.fetchone()
+    cur.execute('Select name from usuarios where cliente = %s and name = %s',(cc,user,))
+    existeUser = cur.fetchone()
+    cur.close()
+    
+    if not existeCC:
+        flash('El cliente ingresado no existe', 'danger')
+        return render_template('Login_register/recu_contraseña.html',cc=cc, user=user, ccErr=True)
+            
+    if not existeUser:
+        flash('El usuario ingresado no existe para ese cliente', 'danger')
+        return render_template('Login_register/recu_contraseña.html',cc=cc, user=user, correoErr=True)
+        
+    if pass1 == '':
+        flash('Por favor ingrese una contraseña', 'danger')
+        return render_template('Login_register/recu_contraseña.html',cc=cc, user=user, contraErr=True)
+        
+    
+    if not pass1 == pass2:
+        flash('Las contraseñas deben ser iguales', 'danger')
+        return render_template('Login_register/recu_contraseña.html',cc=cc, user=user, contraErr=True)
+        
+    if existeCC and existeUser and pass1 != '' and pass1 == pass2:          
+        cur = mysql.connection.cursor()
+        cur.execute('update usuarios set password = %s where cliente = %s and name = %s',(pass1,cc, user,))
+        mysql.connection.commit()
+        cur.close()
+        flash('Contraseña actualizada con exito', 'success')
+        return redirect(url_for('home'))      
+
+
+
 #Metodos para usuario-------------------
 #listar
 @app.route('/listar-usuarios')
@@ -111,16 +293,6 @@ def ListUser():
     
     cur.close()
     return render_template('Users/list_user.html', users = data, dataOpt= dataOpt)
-#editar
-# @app.route('/edit/<id>', methods = ['POST', 'GET'])
-# def get_user(id):
-#     cur=mysql.connection.cursor()
-    
-#     cur.execute('SELECT * FROM usuarios WHERE id = %s', (id,))
-#     data = cur.fetchall()
-#     cur.close()
-#     #print(data[0])
-#     return render_template('Users/edit_user.html', users = data[0])
 #actualizar
 @app.route('/update/<id>', methods=['POST'])
 def update_employee(id):
@@ -278,7 +450,7 @@ def ListPerfil():
 def updatePerfil(id):
     if request.method == 'POST':
         perfil = request.form['txtPerfil']
-        state = request.form['state']
+        #state = request.form['state']
         
         cur = mysql.connection.cursor()
         cur.execute('Select perfiles from perfiles where perfiles = %s',(perfil,))
@@ -308,10 +480,10 @@ def updatePerfil(id):
             cur=mysql.connection.cursor()
             cur.execute("""
                 UPDATE perfiles
-                SET perfiles = %s,
-                    estado = %s
+                SET perfiles = %s
+                    
                 WHERE idperfiles = %s
-            """, (perfil, state,  id))
+            """, (perfil,  id))
         mysql.connection.commit()
         flash('Perfil actualizado exitosamente','success')
         return redirect(url_for('ListPerfil'))
@@ -408,8 +580,8 @@ def ListAcce():
 def updateAcce(id):
     if request.method == 'POST':
         acce = request.form['txtAcce']
-        state = request.form['state']
-        print(state)
+        #state = request.form['state']
+        #print(state)
         
         cur = mysql.connection.cursor()
         cur.execute('Select accesorios from accesorios where accesorios = %s',(acce,))
@@ -428,7 +600,7 @@ def updateAcce(id):
             return render_template('accesorios/list_acce.html', acce = data, acceErrEdit=True, edit_modal=id)
         
         if busquedaCC:
-            if repe['accesorios'] == acce and repe['estado'] == state:
+            if repe['accesorios'] == acce:
                 flash('Accesorio sin cambios detectados', 'success')
                 return redirect(url_for('ListAcce'))
             elif busquedaCC['accesorios']:
@@ -439,10 +611,10 @@ def updateAcce(id):
             cur=mysql.connection.cursor()
             cur.execute("""
                 UPDATE accesorios
-                SET accesorios = %s,
-                    estado = %s
+                SET accesorios = %s
+                    
                 WHERE idaccesorios = %s
-            """, (acce, state,  id))
+            """, (acce,  id))
         mysql.connection.commit()
         flash('Accesorio actualizado exitosamente','success')
         return redirect(url_for('ListAcce'))
@@ -536,7 +708,7 @@ def ListArd():
 def updateArd(id):
     if request.method == 'POST':
         ard = request.form['txtArd']
-        state = request.form['state']
+        #state = request.form['state']
         
         cur = mysql.connection.cursor()
         cur.execute('Select arduino from arduinos where arduino = %s',(ard,))
@@ -570,10 +742,10 @@ def updateArd(id):
             cur=mysql.connection.cursor()
             cur.execute("""
                 UPDATE arduinos
-                SET arduino = %s,
-                    estado = %s
+                SET arduino = %s
+                    
                 WHERE idarduinos= %s
-            """, (ard, state,  id))
+            """, (ard,  id))
         mysql.connection.commit()
         flash('Arduino actualizado exitosamente','success')
         return redirect(url_for('ListArd'))
@@ -668,7 +840,7 @@ def ListTipClient():
 def updateTipClient(id):
     if request.method == 'POST':
         tip = request.form['txtTip']
-        state = request.form['state']
+        #state = request.form['state']
         
         cur = mysql.connection.cursor()
         cur.execute('Select tipo from tipo_clientes where tipo = %s',(tip,))
@@ -701,10 +873,10 @@ def updateTipClient(id):
             cur=mysql.connection.cursor()
             cur.execute("""
                 UPDATE tipo_clientes
-                SET tipo = %s,
-                    estado = %s
+                SET tipo = %s
+                    
                 WHERE idtipo_clientes= %s
-            """, (tip, state,  id))
+            """, (tip,  id))
         mysql.connection.commit()
         flash('Tipo cliente actualizado exitosamente','success')
         return redirect(url_for('ListTipClient'))
@@ -796,7 +968,7 @@ def ListTamanio():
 def updateTamanio(id):
     if request.method == 'POST':
         tam = request.form['txtTam']
-        state = request.form['state']
+        #state = request.form['state']
         
         cur = mysql.connection.cursor()
         cur.execute('Select tamanio from tamanios_invernadero where tamanio = %s',(tam,))
@@ -826,10 +998,10 @@ def updateTamanio(id):
             cur=mysql.connection.cursor()
             cur.execute("""
                 UPDATE tamanios_invernadero
-                SET tamanio = %s,
-                    estado = %s
+                SET tamanio = %s
+                
                 WHERE idtamanios= %s
-            """, (tam, state,  id))
+            """, (tam,  id))
         mysql.connection.commit()
         cur.close()
         flash('Tamaño actualizado exitosamente', 'success')
@@ -922,7 +1094,7 @@ def updateCultivo(id):
         cul = request.form['txtCulti']
         temMin = request.form['txtTempMin']
         temMax = request.form['txtTempMax']
-        state = request.form['state']
+        #state = request.form['state']
         
         cur = mysql.connection.cursor()
         cur.execute('SELECT cultivo, temp_min, temp_max FROM cultivos WHERE idcultivos = %s', (id,))
@@ -980,10 +1152,10 @@ def updateCultivo(id):
             UPDATE cultivos
             SET cultivo = %s,
                 temp_min = %s,
-                temp_max = %s,
-                estado = %s
+                temp_max = %s
+    
             WHERE idcultivos = %s
-        """, (cul,temMin, temMax, state, id))
+        """, (cul,temMin, temMax, id))
         mysql.connection.commit()
         cur.close()
         flash('Cultivo actualizado exitosamente', 'success')
@@ -1104,7 +1276,7 @@ def updateCliente(id):
         tel = request.form['txtTel']
         mail = request.form['txtMail']
         tipe_str = request.form['tipoPersona']
-        state = request.form['state']
+        #state = request.form['state']
         
         cur=mysql.connection.cursor()
         cur.execute(""" select 
@@ -1181,7 +1353,7 @@ def updateCliente(id):
             #return redirect(url_for('ListClient'))
         
         if (repe['nombre_1'] == nam1 and repe['nombre_2'] == nam2 and repe['apellido_1'] == ape1 and repe['apellido_2'] == ape2 and 
-            repe['cedula'] == cc and repe['tipo_cliente'] == tipe and repe['telefono'] == tel and repe['correo'] == mail and repe['estado'] == state):
+            repe['cedula'] == cc and repe['tipo_cliente'] == tipe and repe['telefono'] == tel and repe['correo'] == mail ):
             flash('No hay cambios detectados', 'success')
             return redirect(url_for('ListClient'))
         
@@ -1206,10 +1378,10 @@ def updateCliente(id):
                 cedula = %s,
                 telefono = %s,
                 correo = %s,
-                tipo_cliente = %s,
-                estado = %s
+                tipo_cliente = %s
+                
             WHERE idclientes= %s
-        """, (nam1,nam2,ape1,ape2,cc,tel,mail,tipe,state,  id))
+        """, (nam1,nam2,ape1,ape2,cc,tel,mail,tipe,  id))
         mysql.connection.commit()
         cur.close()
         flash('Cliente actualizado exitosamente', 'success')
@@ -1445,7 +1617,7 @@ def updateDispo(id):
         disp = request.form['txtDispo']
         acce= request.form['accesorio']
         ardui= request.form['arduino']
-        state = request.form['state']
+        #state = request.form['state']
         
         cur = mysql.connection.cursor()
         cur.execute("""select *  from dispositivos WHERE iddispositivo = %s""", (id,))
@@ -1492,10 +1664,10 @@ def updateDispo(id):
             UPDATE dispositivos
             SET nombre = %s,
                 idaccesorio = %s,
-                idarduino = %s,
-                estado = %s
+                idarduino = %s
+            
             WHERE iddispositivo= %s
-        """, (disp,acce,ardui,state,  id))
+        """, (disp,acce,ardui,  id))
         mysql.connection.commit()
         cur.close()
         flash('Dispositivo actualizado exitosamente', 'success')
@@ -1609,7 +1781,7 @@ def deleteTipInv(id):
 def updateTipInv(id):
     if request.method == 'POST':
         tip = request.form['txtTip']
-        state = request.form['state']
+        #state = request.form['state']
         
         cur = mysql.connection.cursor()
         cur.execute('Select tipo_invernadero from tipo_invernadero where tipo_invernadero = %s',(tip,))
@@ -1642,10 +1814,10 @@ def updateTipInv(id):
             cur=mysql.connection.cursor()
             cur.execute("""
                 UPDATE tipo_invernadero
-                SET tipo_invernadero = %s,
-                    estado = %s
+                SET tipo_invernadero = %s
+                    
                 WHERE idtipo_invernadero= %s
-            """, (tip, state,  id))
+            """, (tip,  id))
         mysql.connection.commit()
         flash('Tipo invernadero actualizado exitosamente','success')
         return redirect(url_for('ListTipInve'))
@@ -1834,7 +2006,7 @@ def updateInverna(id):
         dispo_str = request.form['Dispositivo']
         tip_str = request.form['tipo']
         tam_str = request.form['tamanio']
-        state = request.form['state']
+        #state = request.form['state']
         
         
         cur = mysql.connection.cursor()
@@ -1925,7 +2097,7 @@ def updateInverna(id):
                             dataOpt3 = dataOpt3, dataOpt4=dataOpt4, dataOpt5=dataOpt5)
         
         
-        if cc =='' or cult =='' or dispo =='' or tip =='' or tam=='' or state =='':
+        if cc =='' or cult =='' or dispo =='' or tip =='' or tam=='':
             flash('Por favor ingrese un invernadero valido', 'danger')
             return redirect(url_for('ListInverna'))
         
@@ -1952,10 +2124,10 @@ def updateInverna(id):
                 idtamanio = %s,
                 iddispositivo = %s,
                 idcliente = %s,
-                tipo_invernadero = %s,
-                estado = %s
+                tipo_invernadero = %s
+                
             WHERE idinvernaderos= %s
-        """, (inve,cult,tam,dispo,cc,tip,state,  id))
+        """, (inve,cult,tam,dispo,cc,tip,  id))
         mysql.connection.commit()
         cur.close()
         flash('Invernadero actualizado exitosamente', 'success')

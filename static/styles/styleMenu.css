@@ -243,7 +243,37 @@ header .navbar ul li:hover>ul {
     box-shadow: 7px 13px 37px rgba(0, 0, 0, .1);
     padding: 30px 30px;
     border-top: 4px solid rgb(26, 141, 78);
-    ;
+}
+
+.form-login-password {
+    width: 800px;
+    height: auto;
+    margin: auto;
+    margin-top: 180px;
+    box-shadow: 7px 13px 37px rgba(0, 0, 0, .1);
+    padding: 30px 30px;
+    border-top: 4px solid rgb(26, 141, 78);
+}
+
+.form-login-register-cliente {
+    width: 800px;
+    height: auto;
+    margin: auto;
+    margin-top: 30px;
+    box-shadow: 7px 13px 37px rgba(0, 0, 0, .1);
+    padding: 30px 30px;
+    border-top: 4px solid rgb(26, 141, 78);
+    
+}
+
+.form-login-register-user{
+    width: 800px;
+    height: auto;
+    margin: auto;
+    margin-top: 30px;
+    box-shadow: 7px 13px 37px rgba(0, 0, 0, .1);
+    padding: 30px 30px;
+    border-top: 4px solid rgb(26, 141, 78);
 }
 
 .btnregister {

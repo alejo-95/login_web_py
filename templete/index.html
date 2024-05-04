@@ -7,12 +7,13 @@
     <title>Ingresar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="static/styles/styleLogin.css">
-    
+
 </head>
 
 <body>
-    <section class="vh-100" >
+    <section class="vh-100">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-6 text-black">
@@ -23,45 +24,47 @@
                     </div>
 
                     <div class="d-flex align-items-center h-custom-2 px-5 ms-xl-4 mt-5 pt-5 pt-xl-0 mt-xl-n5">
-                    
+
 
                         <form style="width: 23rem;" action="acceso-login" method="POST">
 
-                            <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Ingreso</h3>
-                            
-                            
-                                {% if mensaje %}
-                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                    {{mensaje}}
-                                </div>
-                                {% endif %}
 
-                                {% if mensajeRegister %}
-                                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                    {{mensajeRegister}}
-                                </div>
-                                {% endif %}
-                                
+
+                            <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Ingreso</h3>
+                            {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                            {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                <!-- <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="close"></button> -->
+                                {{ message }}
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                            {% endwith %}
 
                             <div class="form-outline mb-4">
-                                <input type="text" id="form2Example18" class="form-control form-control-lg" name="txtCorreo"/>
+                                <input type="text" id="form2Example18" class="form-control form-control-lg"
+                                    name="txtCorreo" />
                                 <label class="form-label" for="form2Example18">Usuario</label>
                                 <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
                             </div>
 
                             <div class="form-outline mb-4">
-                                <input type="password" id="form2Example28" class="form-control form-control-lg"  name="txtPassword"/>
+                                <input type="password" id="form2Example28" class="form-control form-control-lg"
+                                    name="txtPassword" />
                                 <label class="form-label" for="form2Example28">Contraseña</label>
                             </div>
 
                             <div class="pt-1 mb-4">
                                 <button class="btn btn-default btnLogin" type="submit">Ingresar</button>
-                                
+
                                 <!-- <a href="Page/Menu.html" class="btn btn-default btnLogin">Inicio</a> -->
                             </div>
 
-                            <p class="small mb-5 pb-lg-2"><a class="text-muted" href="#!">Olvidaste tu contraseña?</a></p>
-                            <p>No posees una cuenta? <a href="/add-clientes" class="link-info">Resgistrese aquí</a></p>
+                            <p class="small mb-5 pb-lg-2"><a class="text-muted" href="/rec-contraseña">Olvidaste tu contraseña?</a>
+                            </p>
+                            <p>No posees una cuenta? <a href="/registro" class="link-info">Resgistrese aquí</a></p>
 
                         </form>
 
@@ -69,8 +72,8 @@
 
                 </div>
                 <div class="col-sm-6 px-0 d-none d-sm-block">
-                    <img src="static/images/login_1.jpeg"
-                        alt="Login image" class="w-100 vh-100" style="object-fit: cover; object-position: left;">
+                    <img src="static/images/login_1.jpeg" alt="Login image" class="w-100 vh-100"
+                        style="object-fit: cover; object-position: left;">
                 </div>
             </div>
         </div>

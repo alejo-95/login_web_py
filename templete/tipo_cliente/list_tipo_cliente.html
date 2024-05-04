@@ -87,10 +87,12 @@
             </h3>
         </div>
 
+        {% if 'idperfil' in session and session['idperfil'] == 1 %}
         <div>
             <button class="btn btn-outline-success" data-bs-toggle="modal"
                     data-bs-target="#perfilModal"> Nuevo tipo cliente</button>
         </div>
+        {% endif %}
 
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -112,7 +114,9 @@
                     <th>ID</th>
                     <th>Tipo Cliente</th>
                     <th>Estado</th>
+                    {% if 'idperfil' in session and session['idperfil'] == 1 %}
                     <th>Acción</th>
+                    {%endif%}
                 </tr>
             </thead>
             <tbody>
@@ -121,13 +125,14 @@
                     <td>{{data.idtipo_clientes}}</th>
                     <td>{{data.tipo}}</td>
                     <td>{{data.status}}</td>
+                    {% if 'idperfil' in session and session['idperfil'] == 1 %}
                     <td class="text-center">
                         <a href="/updateTipClient/{{data.idtipo_clientes}}" class="bi-pencil-fill edit_action" title="edit"
                             data-bs-toggle="modal" data-bs-target="#editModal{{data.idtipo_clientes}}"></a>
                         <a href="/InhabilTipClient/{{data.idtipo_clientes}}" class="bi bi-ban btn-inhabi" title="Inhabilitar"></a>
-                        <a href="/deleteTipClient/{{data.idtipo_clientes}}" class="bi-eraser-fill btn-delete" title="delete"></a>
-                        
+                        <a href="/deleteTipClient/{{data.idtipo_clientes}}" class="bi-eraser-fill btn-delete" title="delete"></a>                      
                     </td>
+                    {%endif%}
                 </tr>
 
                 <!-- Edicion -->
@@ -160,13 +165,13 @@
                                             {%endif%}
                                             {%endwith%}
                                     </div>
-                                    <div class="form-group mb-4 modalForm">
+                                    <!-- <div class="form-group mb-4 modalForm">
                                         <label for="exampleInputPassword1">Estado</label>
                                         <select name="state" class="form-control" title="option2">
                                                 <option value="0">Habilitado</option>
                                                 <option value="1">Deshabilitado</option>
                                         </select>
-                                    </div>
+                                    </div> -->
                                     <div class="modal-footer">
                                         <button class="btn btn-outline-danger" data-bs-dismiss="modal" type="button">Cancelar</button>
                                         <button class="btn btn-outline-primary" type="submit">Actualizar</button>

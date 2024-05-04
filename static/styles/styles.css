@@ -19,6 +19,11 @@
     color: #dfce35;
 }
 
+.reaload-act{
+    color:  rgb(26, 141, 78);
+    font-size: 32px;
+}
+
 .btnregister {
     background-color: rgb(26, 141, 78);
     color: #fff;
