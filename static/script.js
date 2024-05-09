@@ -21,7 +21,7 @@ $(document).ready(function () {
         //     }
         // },
         "aLengthMenu": [[5, 10, 25, -1], [5, 10, 25, "Todo"]],
-        "iDisplayLength": 5,
+        "iDisplayLength": 10,
         "language": {
             "lengthMenu": "Mostrar _MENU_ datos por página",
             "zeroRecords": "No se encuentran datos - lo sentimos",

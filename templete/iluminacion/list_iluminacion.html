@@ -31,14 +31,14 @@
 
                 <div class="modal-header">
                     <h5 class="modal-title text-primary new_title">
-                        Por favor cree un nuevo perfil
+                        Por favor cree un nuevo sensor
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" title="exit">
                     </button>
                 </div>
 
 
-                <form action="/add-perfiles" method="POST">
+                <form action="/add-tipIlum" method="POST">
                     <div class="modal-body" class="form-control form-login-register">
                         {%with messages = get_flashed_messages(with_categories=true)%}
                         {%if messages and dupliErr%}
@@ -49,11 +49,11 @@
                         {%endif%}
                         {%endwith%}
                         <div class="form-group mb-3 modalForm">
-                            <label for="exampleInputEmail1">Perfil</label>
+                            <label for="exampleInputEmail1">Accesorio</label>
                             <input type="text" class="form-control" id="usertxt" aria-describedby="emailHelp"
-                                placeholder="Ingrese el perfil" name="txtPerfil" value="{{perfilTxt}}">
+                                placeholder="Ingrese el accesorio" name="txtAcce" value="{{acceTxt}}">
                             {%with messages = get_flashed_messages(with_categories=true)%}
-                            {%if messages and perfilErr%}
+                            {%if messages and acceErr%}
                             {% for category, message in messages %}
                             <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
                                 {{message}}</div>
@@ -86,13 +86,13 @@
 
         <div>
             <h3 class="text-center title_module">
-                Gestión perfiles
+                Gestión sensores
             </h3>
         </div>
 
         <div>
             <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#perfilModal"> Nuevo
-                perfil</button>
+                sensor</button>
         </div>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -113,36 +113,37 @@
             <thead>
                 <tr class="table_u ">
                     <th>ID</th>
-                    <th>Perfil</th>
+                    <th>Iluminacion</th>
                     <th>Estado</th>
                     <th>Acción</th>
                 </tr>
             </thead>
             <tbody>
-                {% for data in perfil %}
+                {% for data in tip %}
                 <tr>
-                    <td>{{data.idperfiles}}</th>
-                    <td>{{data.perfiles}}</td>
+                    <td>{{data.idtipo_iluminacion}}</th>
+                    <td>{{data.iluminacion}}</td>
                     <td>{{data.status}}</td>
                     <td class="text-center">
-                        <a href="/updatePerfil/{{data.idperfiles}}" class="bi-pencil-fill edit_action" title="edit"
-                            data-bs-toggle="modal" data-bs-target="#editModal{{data.idperfiles}}"></a>
-                        <a href="/InhabilPerfil/{{data.idperfiles}}" class="bi bi-ban btn-inhabi"
-                            title="Inhabilitar"></a>
-                        <a href="/deletePerfil/{{data.idperfiles}}" class="bi-eraser-fill btn-delete"
+                        <a href="/updateTipIlum/{{data.idtipo_iluminacion}}" class="bi-pencil-fill edit_action" title="edit"
+                            data-bs-toggle="modal" data-bs-target="#editModal{{data.idtipo_iluminacion}}"></a>
+                        <a href="/InhabilAcce/{{data.idtipo_iluminacion}}" class="bi bi-ban btn-inhabi" title="Inhabilitar"></a>
+                        <a href="/deleteTipIlum/{{data.idtipo_iluminacion}}" class="bi-eraser-fill btn-delete"
                             title="delete"></a>
                     </td>
                 </tr>
 
                 <!-- Edicion -->
-                <div class="modal fade" id="editModal{{data.idperfiles}}" data-bs-backdrop="static" role="dialog">
+                <div class="modal fade" id="editModal{{data.idtipo_iluminacion}}" data-bs-backdrop="static" role="dialog">
                     <div class="modal-dialog modal-dialog-scrollable">
+
                         <div class="modal-content">
+
                             <div class="modal-header">
-                                <h5>Editar Perfil</h5>
+                                <h5>Editar Sensor</h5>
                                 <button class="btn-close" data-bs-dismiss="modal" title="exit"></button>
                             </div>
-                            <form action="/updatePerfil/{{data.idperfiles}}" method="POST">
+                            <form action="/updateTipIlum/{{data.idtipo_iluminacion}}" method="POST">
                                 <div class="modal-body" class="form-control form-login-register">
                                     {%with messages = get_flashed_messages(with_categories=true)%}
                                     {%if messages and dupliErrEdit%}
@@ -153,18 +154,18 @@
                                     {%endif%}
                                     {%endwith%}
                                     <div class="form-group mb-3 modalForm">
-                                        <label for="exampleInputEmail1">Perfil</label>
+                                        <label for="exampleInputEmail1">Accesorio</label>
                                         <input type="text" class="form-control" id="exampleInputEmail1"
-                                            aria-describedby="emailHelp" placeholder="Enter email" name="txtPerfil"
-                                            value="{{data.perfiles}}">
-                                        {%with messages = get_flashed_messages(with_categories=true)%}
-                                        {%if messages and perfilErrEdit%}
-                                        {% for category, message in messages %}
-                                        <div class="alert alert-{{category}} alert-dismissible fade show mt-3"
-                                            role="alert">{{message}}</div>
-                                        {%endfor%}
-                                        {%endif%}
-                                        {%endwith%}
+                                            aria-describedby="emailHelp" placeholder="Ingrese Accesorio" name="txtAcce"
+                                            value="{{data.iluminacion}}">
+                                            {%with messages = get_flashed_messages(with_categories=true)%}
+                                            {%if messages and acceErrEdit%}
+                                            {% for category, message in messages %}
+                                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
+                                                {{message}}</div>
+                                            {%endfor%}
+                                            {%endif%}
+                                            {%endwith%}
                                     </div>
                                     <!-- <div class="form-group mb-4 modalForm">
                                         <label for="exampleInputPassword1">Estado</label>
@@ -208,6 +209,7 @@
                 });
             })
         }
+        
         const btninhabili = document.querySelectorAll('.btn-inhabi');
         if (btninhabili) {
             const btnArray = Array.from(btninhabili);
@@ -219,11 +221,12 @@
                 });
             })
         }
+
     </script>
 
     {% if add_modal %}
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             $('#perfilModal').modal('show');
         });
     </script>
@@ -236,6 +239,7 @@
         });
     </script>
     {% endif %}
+
 </body>
 
 </html>

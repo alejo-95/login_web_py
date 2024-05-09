@@ -55,7 +55,8 @@ def login():
                 return render_template('menu/admin.html')
         
         else:
-            return render_template('index.html',mensaje='El usuario y/o la contraseña son incorrectos')    
+            flash('El usuario y/o la contraseña son incorrectos', 'danger')
+            return render_template('index.html')    
 
 #Salir
 @app.route('/logout')
@@ -76,7 +77,7 @@ def initRegister():
 #Crear Cliente registro
 @app.route('/crear_registro', methods=["GET", "POST"])
 def registro():
-    print(request.form)
+    #print(request.form)
     
     nam1 = request.form['txtName1']
     nam2= request.form['txtName2']
@@ -103,50 +104,50 @@ def registro():
     if not validar_cc(cc):
         flash('La cédula ingresada no es valida', 'danger')
         return render_template('login_register/registro.html',client = data, ccErr=True,dataOpt=dataOpt, add_modal=True,
-        cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail)
+        cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail, cliente= True)
     
     if not validar_nombre(nam1):
         flash('El nombre ingresado no es valido', 'danger')
         return render_template('login_register/registro.html',client = data, nam1Err=True,dataOpt=dataOpt, add_modal=True,
-        cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail)
+        cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail, cliente= True)
         #return redirect(url_for('ListClient'))
     
     if nam2 != '':
         if not validar_nombre(nam2):
             flash('El segundo nombre ingresado no es valido', 'danger')
             return render_template('login_register/registro.html',client = data, nam2Err=True,dataOpt=dataOpt, add_modal=True,
-            cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail)
+            cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail,cliente= True)
             #return redirect(url_for('ListClient'))
         
     if not validar_nombre(ape1):
         flash('El apellido ingresado no es valido', 'danger')
         return render_template('login_register/registro.html',client = data, ape1Err=True,dataOpt=dataOpt, add_modal=True,
-        cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail)
+        cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail, cliente= True)
         #return redirect(url_for('ListClient'))
     
     if nam2 != '':
         if not validar_nombre(ape2):
             flash('El segundo apellido ingresado no es valido', 'danger')
             return render_template('login_register/registro.html',client = data, ape2Err=True,dataOpt=dataOpt, add_modal=True,
-            cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail)
+            cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail, cliente= True)
             #return redirect(url_for('ListClient'))
         
     if not validar_celular(tel):
         flash('El celular ingresado no es valido', 'danger')
         return render_template('login_register/registro.html',client = data, telErr=True,dataOpt=dataOpt, add_modal=True,
-        cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail)
+        cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail, cliente= True)
         #return redirect(url_for('ListClient'))
     
     if not validar_correo(mail):
         flash('El correo inrgesado es incorrecto', 'danger')
         return render_template('login_register/registro.html',client = data, mailErr=True,dataOpt=dataOpt, add_modal=True,
-        cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail)
+        cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail, cliente= True)
         #return redirect(url_for('ListClient'))
     
     if nam1 == '' or ape1 == "" or cc == '' or tel == '' or mail =='' or tipe =='':
         flash('Por favor ingrese un cliente valido', 'danger')
         return render_template('login_register/registro.html',client = data, dupliErr=True,dataOpt=dataOpt, add_modal=True,
-        cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail)
+        cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail, cliente= True)
         #return redirect(url_for('ListClient'))
     
     if not cc =='':
@@ -160,7 +161,7 @@ def registro():
         flash(f'El cliente con cédula {cc} ya se encuentra creado', 'danger')
         #return redirect(url_for('ListClient'))
         return render_template('login_register/registro.html',client = data, dupliErr=True,dataOpt=dataOpt, add_modal=True,
-        cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail)
+        cc=cc,nam1=nam1,nam2=nam2,ape1=ape1,ape2=ape2, tel=tel, mail=mail, cliente= True)
     else:
 
         try:
@@ -171,7 +172,7 @@ def registro():
             cur.close()
             flash('Cliente agregado con exito, por favor cree el usuario', 'success')
             return render_template('login_register/registro.html',dupliErr=True,usuario=True, cliente=False, cc=cc)
-        except mysql.connector.Error as e:
+        except Exception as e:
             if e.errno == 1451:
                 flash('No se puede eliminar el cliente porque está relacionado con otros registros.', 'danger')
             else:
@@ -1678,13 +1679,14 @@ def ListDispo():
     cur=mysql.connection.cursor()
     
     cur.execute(""" select
-                d.iddispositivo, d.nombre, ac.accesorios, ar.arduino, tm.tipo_motor,
+                d.iddispositivo, d.nombre, ac.accesorios, ar.arduino, tm.tipo_motor, ti.iluminacion,
                 Case when d.estado = 0 then 'Habilitado' When d.estado = 1 then 'Deshabilitado'
                 End as status
                 from dispositivos d
                 inner join tipo_arduino ar on ar.idarduinos = d.idarduino
                 inner join tipo_sensor ac on ac.idaccesorios = d.idaccesorio
-                inner join prueba.tipo_motor tm on d.idmotor = tm.idtipo_motor""")
+                inner join prueba.tipo_motor tm on d.idmotor = tm.idtipo_motor
+                inner join tipo_iluminacion ti on ti.idtipo_iluminacion = d.idiluminacion""")
     data = cur.fetchall()
     
     cur.execute('SELECT idarduinos, arduino FROM tipo_arduino ')
@@ -1693,10 +1695,12 @@ def ListDispo():
     dataOpt2 = cur.fetchall()
     cur.execute('SELECT idtipo_motor, tipo_motor FROM tipo_motor ')
     dataOpt3 = cur.fetchall()
+    cur.execute('SELECT idtipo_iluminacion, iluminacion FROM tipo_iluminacion ')
+    dataOpt4 = cur.fetchall()
     
     
     cur.close()
-    return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt= dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3)
+    return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt= dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3, dataOpt4= dataOpt4)
 #Agregar
 @app.route('/add-dispo', methods=["POST","GET"])
 def addDispo():
@@ -1706,18 +1710,20 @@ def addDispo():
     ardui= request.form['arduino']
     state = request.form['state']
     mot = request.form['motor']
+    ilum= request.form['iluminacion']
     #print(nam1)
     cur = mysql.connection.cursor()
     cur.execute('Select * from dispositivos where nombre = %s',(disp,))
     busquedaCC = cur.fetchone()
     cur.execute(""" select
-                d.iddispositivo, d.nombre, ac.accesorios, ar.arduino, tm.tipo_motor,
+                d.iddispositivo, d.nombre, ac.accesorios, ar.arduino, tm.tipo_motor, ti.iluminacion,
                 Case when d.estado = 0 then 'Habilitado' When d.estado = 1 then 'Deshabilitado'
                 End as status
                 from dispositivos d
                 inner join tipo_arduino ar on ar.idarduinos = d.idarduino
                 inner join tipo_sensor ac on ac.idaccesorios = d.idaccesorio
-                inner join prueba.tipo_motor tm on d.idmotor = tm.idtipo_motor""")
+                inner join prueba.tipo_motor tm on d.idmotor = tm.idtipo_motor
+                inner join tipo_iluminacion ti on ti.idtipo_iluminacion = d.idiluminacion""")
     data = cur.fetchall()
     
     cur.execute('SELECT idarduinos, arduino FROM tipo_arduino ')
@@ -1726,37 +1732,44 @@ def addDispo():
     dataOpt2 = cur.fetchall()
     cur.execute('SELECT idtipo_motor, tipo_motor FROM tipo_motor ')
     dataOpt3 = cur.fetchall()
+    cur.execute('SELECT idtipo_iluminacion, iluminacion FROM tipo_iluminacion ')
+    dataOpt4 = cur.fetchall()
     cur.close()
     
     if not validar_espacios(disp):
         flash('El dispositivo ingresado no es valido', 'danger')
-        return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3,dispErr=True, add_modal=True,
+        return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3, dataOpt4=dataOpt4, dispErr=True, add_modal=True,
         disp= disp)
         
     if acce == '':
         flash('Por favor ingrese un accesorio', 'danger')
-        return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3,accErr=True, add_modal=True,
+        return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3, dataOpt4=dataOpt4,accErr=True, add_modal=True,
         disp= disp)
         
     if ardui == '':
         flash('Por favor ingrese un arduino', 'danger')
-        return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3,arduiErr=True, add_modal=True,
+        return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3, dataOpt4=dataOpt4,arduiErr=True, add_modal=True,
         disp= disp)
         
     if mot == '':
         flash('Por favor ingrese un motor', 'danger')
-        return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3,motorErr=True, add_modal=True,
+        return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3, dataOpt4=dataOpt4,motorErr=True, add_modal=True,
         disp= disp)
-    
+        
+    if ilum == '':
+        flash('Por favor ingrese una iluminación', 'danger')
+        return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3, dataOpt4=dataOpt4,motorErr=True, add_modal=True,
+        disp= disp)
+        
     
     if  busquedaCC: 
         flash(f'El dispositivo {disp} ya se encuentra creado', 'danger')
-        return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3,dupliErr=True, add_modal=True,
+        return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3, dataOpt4=dataOpt4,dupliErr=True, add_modal=True,
         disp= disp) 
     else:
         try:
             cur = mysql.connection.cursor()
-            cur.execute("INSERT INTO dispositivos (nombre, idaccesorio,idarduino,idmotor,estado)values(%s,%s,%s,%s,%s)",(disp,acce,ardui,mot,state))
+            cur.execute("INSERT INTO dispositivos (nombre, idaccesorio,idarduino,idmotor,idiluminacion,estado)values(%s,%s,%s,%s,%s,%s)",(disp,acce,ardui,mot,ilum,state))
             mysql.connection.commit()
             cur.close()
             flash('Dispositivo agregado con exito', 'success')
@@ -1773,19 +1786,21 @@ def updateDispo(id):
         acce= request.form['accesorio']
         ardui= request.form['arduino']
         mot= request.form['motor']
+        ilum= request.form['iluminacion']
         #state = request.form['state']
         
         cur = mysql.connection.cursor()
         cur.execute("""select *  from dispositivos WHERE iddispositivo = %s""", (id,))
         repe = cur.fetchone()
         cur.execute(""" select
-                d.iddispositivo, d.nombre, ac.accesorios, ar.arduino, tm.tipo_motor,
+                d.iddispositivo, d.nombre, ac.accesorios, ar.arduino, tm.tipo_motor, ti.iluminacion,
                 Case when d.estado = 0 then 'Habilitado' When d.estado = 1 then 'Deshabilitado'
                 End as status
                 from dispositivos d
                 inner join tipo_arduino ar on ar.idarduinos = d.idarduino
                 inner join tipo_sensor ac on ac.idaccesorios = d.idaccesorio
-                inner join prueba.tipo_motor tm on d.idmotor = tm.idtipo_motor""")
+                inner join prueba.tipo_motor tm on d.idmotor = tm.idtipo_motor
+                inner join tipo_iluminacion ti on ti.idtipo_iluminacion = d.idiluminacion""")
         data = cur.fetchall()
         
         cur.execute('SELECT idarduinos, arduino FROM tipo_arduino ')
@@ -1794,23 +1809,25 @@ def updateDispo(id):
         dataOpt2 = cur.fetchall()
         cur.execute('SELECT idtipo_motor, tipo_motor FROM tipo_motor ')
         dataOpt3 = cur.fetchall()
+        cur.execute('SELECT idtipo_iluminacion, iluminacion FROM tipo_iluminacion ')
+        dataOpt4 = cur.fetchall()
         cur.close()
         
         if not validar_espacios(disp):
             flash('El dispositivo ingresado no es valido', 'danger')
-            return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3,dispErrEdit=True, edit_modal=id)
+            return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3, dataOpt4=dataOpt4,dispErrEdit=True, edit_modal=id)
             
         if acce == '':
             flash('Por favor ingrese un accesorio', 'danger')
-            return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3,accErrEdit=True, edit_modal=id)
+            return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3, dataOpt4=dataOpt4,accErrEdit=True, edit_modal=id)
             
         if ardui == '':
             flash('Por favor ingrese un arduino', 'danger')
-            return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3,arduiErrEdit=True, edit_modal=id)
+            return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3, dataOpt4=dataOpt4,arduiErrEdit=True, edit_modal=id)
         
         if mot == '':
             flash('Por favor ingrese un motor', 'danger')
-            return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3,motorErr=True, edit_modal=id)
+            return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3, dataOpt4=dataOpt4,motorErr=True, edit_modal=id)
         
         if repe['nombre'] != disp:
             cur = mysql.connection.cursor()
@@ -1820,7 +1837,7 @@ def updateDispo(id):
             
             if existe:
                 flash(f'El dispositivo {disp} ya se encuentra creado', 'danger')
-                return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dupliErrEdit=True, edit_modal=id) 
+                return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt=dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3, dataOpt4=dataOpt4, dupliErrEdit=True, edit_modal=id) 
         
         cur=mysql.connection.cursor()
         cur.execute("""
@@ -1828,10 +1845,11 @@ def updateDispo(id):
             SET nombre = %s,
                 idaccesorio = %s,
                 idarduino = %s,
-                idmotor = %s
+                idmotor = %s,
+                idiluminacion =%s
             
             WHERE iddispositivo= %s
-        """, (disp,acce,ardui,mot,  id))
+        """, (disp,acce,ardui,mot,ilum, id))
         mysql.connection.commit()
         cur.close()
         flash('Dispositivo actualizado exitosamente', 'success')
@@ -2003,6 +2021,138 @@ def InhaTipInv(id):
     finally:
         cur.close()
     return redirect(url_for('ListTipInve'))
+
+
+#Metodos para tipo_iluminacion
+#listar
+@app.route('/listar-tipIlum')
+def ListTipIlum():
+    cur=mysql.connection.cursor()
+
+    cur.execute("""SELECT idtipo_iluminacion, iluminacion,
+                    Case when estado = 0 then 'Habilitado' When estado = 1 then 'Deshabilitado' 
+                    End as status
+                    FROM tipo_iluminacion""")
+    data = cur.fetchall()
+
+    cur.close()
+    return render_template('iluminacion/list_iluminacion.html', tip = data)
+#Agregar
+@app.route('/add-tipIlum', methods=["POST","GET"])
+def addTipIlum():
+    tip = request.form['txtTip']
+    state = request.form['state']
+    
+    cur = mysql.connection.cursor()
+    cur.execute('Select iluminacion from tipo_iluminacion where iluminacion = %s',(tip,))
+    busquedaCC = cur.fetchone()
+    cur.execute("""SELECT idtipo_iluminacion, iluminacion,
+                    Case when estado = 0 then 'Habilitado' When estado = 1 then 'Deshabilitado' 
+                    End as status
+                    FROM tipo_iluminacion""")
+    data = cur.fetchall()
+    cur.close()
+    
+    if not validar_espacios(tip):
+        flash('Por favor ingrese un tipo de iluminación válido', 'danger')
+        return render_template('iluminacion/list_iluminacion.html', tipErr=True, add_modal=True, tip= data, tipe=tip)
+    
+    if  busquedaCC: 
+        flash(f'El tipo de iluminación {tip} ya se encuentra creado', 'danger')
+        return render_template('iluminacion/list_iluminacion.html', dupliErr=True, add_modal=True, tip= data, tipe=tip)
+    else:
+
+        try:
+            cur = mysql.connection.cursor()
+            cur.execute("INSERT INTO tipo_invernadero (tipo_invernadero, estado) VALUES (%s, %s)", (tip, state))
+            mysql.connection.commit()
+            flash('Tipo de iluminación agregado con exito', 'success')
+            return redirect(url_for('ListTipIlum'))
+        except Exception as e:
+
+            return 
+#Eliminar
+@app.route('/deleteTipIlum/<string:id>', methods = ['POST','GET'])
+def deleteTipIlum(id): 
+    cur=mysql.connection.cursor()
+    
+    try:
+        cur.execute('DELETE FROM tipo_iluminacion WHERE idtipo_iluminacion = {0}'.format(id))
+        mysql.connection.commit()
+        flash('Tipo de iluminación eliminado exitosamente')
+        return redirect(url_for('ListTipIlum'))
+    except Exception  as e:
+        if '1451' in str(e):
+            flash('No se puede eliminar el tipo de iluminación porque está relacionado con otros registros.', 'warning')
+        else:
+            flash('Error al eliminar el tipo de iluminación: {}'.format(str(e)), 'warning')
+    finally:
+        cur.close()
+    return redirect(url_for('ListTipIlum'))
+#Actualizar
+@app.route('/updateTipIlum/<id>', methods=['POST'])
+def updateTipIlum(id):
+    if request.method == 'POST':
+        tip = request.form['txtTip']
+        #state = request.form['state']
+        
+        cur = mysql.connection.cursor()
+        cur.execute('Select iluminacion from tipo_iluminacion where idtipo_iluminacion = %s',(tip,))
+        busquedaCC = cur.fetchone()
+        cur.execute('Select iluminacion from tipo_iluminacion where idtipo_iluminacion = %s',(id,))
+        repe = cur.fetchone()
+        cur.execute("""SELECT idtipo_iluminacion, iluminacion,
+                    Case when estado = 0 then 'Habilitado' When estado = 1 then 'Deshabilitado' 
+                    End as status
+                    FROM tipo_iluminacion""")
+        data = cur.fetchall()
+        cur.close()
+    
+        if not validar_espacios(tip):
+            flash('Por favor ingrese un tipo de iluminación válido', 'danger')
+            return render_template('iluminacion/list_iluminacion.html', tipErr=True, add_modal=True, tip= data, tipe=tip)
+        
+        if  tip == '':
+            flash('Por favor ingrese un tipo iluminación válido', 'danger')
+            return render_template('iluminacion/list_iluminacion.html', tipErr=True, add_modal=True, tip= data, tipe=tip)
+        
+        if busquedaCC:
+            if repe['tipo_invernadero'] == tip:
+                flash('Tipo de iluminación sin cambios detectados', 'success')
+                return redirect(url_for('ListTipInve'))
+            elif busquedaCC['tipo_invernadero']:
+                flash(f'El tipo de iluminación {tip} ya se encuentra creado', 'danger')
+                return render_template('iluminacion/list_iluminacion.html', dupliErr=True, add_modal=True, tip= data, tipe=tip)     
+        else:
+            cur=mysql.connection.cursor()
+            cur.execute("""
+                UPDATE tipo_iluminacion
+                SET iluminacion = %s
+                    
+                WHERE idtipo_iluminacion= %s
+            """, (tip,  id))
+        mysql.connection.commit()
+        flash('Tipo de iluminación actualizado exitosamente','success')
+        return redirect(url_for('ListTipIlum'))
+#Inhabilitar
+@app.route('/InhabilTipIlum/<string:id>', methods = ['POST','GET'])
+def InhaTipIlum(id):
+    try:
+        cur=mysql.connection.cursor()
+        cur.execute('Update tipo_iluminacion  set estado = 1 WHERE idtipo_iluminacion = {0}'.format(id))
+        mysql.connection.commit()
+        cur.close()
+        flash('Tipo de iluminación inhabilitado exitosamente', 'success')
+        return redirect(url_for('ListTipIlum'))
+    except Exception  as e:
+        if '1451' in str(e):
+            flash('No se puede inhabilitar el tipo de iluminación porque está relacionado con otros registros.', 'warning')
+        else:
+            flash('Error al inhabilitar el tipo de iluminación: {}'.format(str(e)), 'warning')
+    finally:
+        cur.close()
+    return redirect(url_for('ListTipIlum'))
+
 
 
 #Metodos para invernaderos
