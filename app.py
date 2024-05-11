@@ -41,7 +41,7 @@ def login():
         
         
         cur=mysql.connection.cursor()
-        cur.execute('SELECT * FROM USUARIOS WHERE name = %s AND password = %s',(_correo, _password,))
+        cur.execute('SELECT * FROM USUARIOS WHERE name = %s AND password = %s ',(_correo, _password,))
         account = cur.fetchone()
         
         if account:
@@ -289,7 +289,7 @@ def ListUser():
     cur.execute('SELECT u.id, u.name, u.password, p.perfiles FROM usuarios u inner join perfiles p on u.idperfil = p.idperfiles')
     data = cur.fetchall()
     
-    cur.execute('SELECT idperfiles, perfiles FROM perfiles ')
+    cur.execute('SELECT idperfiles, perfiles FROM perfiles where estado = 0')
     dataOpt = cur.fetchall()
     
     cur.close()
@@ -308,7 +308,7 @@ def update_employee(id):
         repe = cur.fetchone()
         cur.execute('SELECT u.id, u.name, u.password, p.perfiles FROM usuarios u inner join perfiles p on u.idperfil = p.idperfiles')
         data = cur.fetchall() 
-        cur.execute('SELECT idperfiles, perfiles FROM perfiles ')
+        cur.execute('SELECT idperfiles, perfiles FROM perfiles where estado = 0')
         dataOpt = cur.fetchall()
         cur.close()
     
@@ -383,7 +383,7 @@ def addUser():
     busquedaCC = cur.fetchone()
     cur.execute('SELECT u.id, u.name, u.password, p.perfiles FROM usuarios u inner join perfiles p on u.idperfil = p.idperfiles')
     data = cur.fetchall() 
-    cur.execute('SELECT idperfiles, perfiles FROM perfiles ')
+    cur.execute('SELECT idperfiles, perfiles FROM perfiles where estado = 0')
     dataOpt = cur.fetchall()
     cur.execute('Select cedula from clientes where cedula =  %s',(cc,))
     cedula = cur.fetchone()
@@ -552,21 +552,34 @@ def addPerfil():
 #Inhabilitar
 @app.route('/InhabilPerfil/<string:id>', methods = ['POST','GET'])
 def InhaPerfil(id): 
-    try:
-        cur=mysql.connection.cursor()
-        cur.execute('Update perfiles  set estado = 1 WHERE idperfiles = {0}'.format(id))
-        mysql.connection.commit()
-        cur.close()
-        flash('Perfil inhabilitado exitosamente', 'success')
+    cur = mysql.connection.cursor()
+    cur.execute("""Select distinct tp.idperfiles
+    from perfiles tp
+    inner join usuarios d on tp.idperfiles = d.idperfil
+    Where tp.idperfiles = %s """,(id))
+    inhabi = cur.fetchone()
+    cur.close()
+    
+    if inhabi:
+        flash('No se puede inhabilitar el perfil porque está relacionado con otros registros.', 'warning')
         return redirect(url_for('ListPerfil'))
-    except Exception  as e:
-        if '1451' in str(e):
-            flash('No se puede inhabilitar el perfil porque está relacionado con otros registros.', 'warning')
-        else:
-            flash('Error al inhabilitar el perfil: {}'.format(str(e)), 'warning')
-    finally:
-        cur.close()
-    return redirect(url_for('ListPerfil'))
+    else:
+    
+        try:
+            cur=mysql.connection.cursor()
+            cur.execute('Update perfiles  set estado = 1 WHERE idperfiles = {0}'.format(id))
+            mysql.connection.commit()
+            cur.close()
+            flash('Perfil inhabilitado exitosamente', 'success')
+            return redirect(url_for('ListPerfil'))
+        except Exception  as e:
+            if '1451' in str(e):
+                flash('No se puede inhabilitar el perfil porque está relacionado con otros registros.', 'warning')
+            else:
+                flash('Error al inhabilitar el perfil: {}'.format(str(e)), 'warning')
+        finally:
+            cur.close()
+        return redirect(url_for('ListPerfil'))
 
 
 #Metodos para sensores
@@ -681,21 +694,32 @@ def addAcce():
 #Inhabilitar
 @app.route('/InhabilAcce/<string:id>', methods = ['POST','GET'])
 def InhaAcce(id): 
-    try:
-        cur=mysql.connection.cursor()
-        cur.execute('Update tipo_sensor  set estado = 1 WHERE idaccesorios = {0}'.format(id))
-        mysql.connection.commit()
-        cur.close()
-        flash('Accesorio inhabilitado exitosamente', 'success')
+    cur = mysql.connection.cursor()
+    cur.execute("""Select distinct tp.idaccesorios
+    from tipo_sensor tp
+    inner join dispositivos d on tp.idaccesorios = d.idaccesorio
+    Where idaccesorios = %s """,(id))
+    inhabi = cur.fetchone()
+    
+    if inhabi:
+        flash('No se puede inhabilitar el accesorio porque está relacionado con otros registros.', 'warning')
         return redirect(url_for('ListAcce'))
-    except Exception  as e:
-        if '1451' in str(e):
-            flash('No se puede eliminar el accesorio porque está relacionado con otros registros.', 'warning')
-        else:
-            flash('Error al eliminar el accesorio: {}'.format(str(e)), 'warning')
-    finally:
-        cur.close()
-    return redirect(url_for('ListAcce'))
+    else:   
+        try:
+            cur=mysql.connection.cursor()
+            cur.execute('Update tipo_sensor  set estado = 1 WHERE idaccesorios = {0}'.format(id))
+            mysql.connection.commit()
+            cur.close()
+            flash('Accesorio inhabilitado exitosamente', 'success')
+            return redirect(url_for('ListAcce'))
+        except Exception  as e:
+            if '1451' in str(e):
+                flash('No se puede eliminar el accesorio porque está relacionado con otros registros.', 'warning')
+            else:
+                flash('Error al eliminar el accesorio: {}'.format(str(e)), 'warning')
+        finally:
+            cur.close()
+        return redirect(url_for('ListAcce'))
 
 #Metodos para arduinos
 #Listar
@@ -814,21 +838,33 @@ def addArd():
 #Inhabilitar
 @app.route('/InhabilArd/<string:id>', methods = ['POST','GET'])
 def InhaArd(id): 
-    try:
-        cur=mysql.connection.cursor()
-        cur.execute('Update tipo_arduino  set estado = 1 WHERE idarduinos = {0}'.format(id))
-        mysql.connection.commit()
-        cur.close()
-        flash('Arduino inhabilitado exitosamente', 'success')
+    
+    cur = mysql.connection.cursor()
+    cur.execute("""Select distinct tp.idarduinos
+    from tipo_arduino tp
+    inner join dispositivos d on tp.idarduinos = d.idarduino
+    Where idarduinos = %s """,(id))
+    inhabi = cur.fetchone()
+    
+    if inhabi:
+        flash('No se puede inhabilitar el arduino porque está relacionado con otros registros.', 'warning')
         return redirect(url_for('ListArd'))
-    except Exception  as e:
-        if '1451' in str(e):
-            flash('No se puede inhabilitar el Arduino porque está relacionado con otros registros.', 'warning')
-        else:
-            flash('Error al inhabilitar el Arduino: {}'.format(str(e)), 'warning')
-    finally:
-        cur.close()
-    return redirect(url_for('ListArd'))
+    else:  
+        try:
+            cur=mysql.connection.cursor()
+            cur.execute('Update tipo_arduino  set estado = 1 WHERE idarduinos = {0}'.format(id))
+            mysql.connection.commit()
+            cur.close()
+            flash('Arduino inhabilitado exitosamente', 'success')
+            return redirect(url_for('ListArd'))
+        except Exception  as e:
+            if '1451' in str(e):
+                flash('No se puede inhabilitar el Arduino porque está relacionado con otros registros.', 'warning')
+            else:
+                flash('Error al inhabilitar el Arduino: {}'.format(str(e)), 'warning')
+        finally:
+            cur.close()
+        return redirect(url_for('ListArd'))
 
 
 #Metodos para motor
@@ -948,21 +984,32 @@ def addMot():
 #Inhabilitar
 @app.route('/InhabilMot/<string:id>', methods = ['POST','GET'])
 def InhaMot(id): 
-    try:
-        cur=mysql.connection.cursor()
-        cur.execute('Update tipo_motor  set estado = 1 WHERE idtipo_motor = {0}'.format(id))
-        mysql.connection.commit()
-        cur.close()
-        flash('Motor inhabilitado exitosamente', 'success')
+    cur = mysql.connection.cursor()
+    cur.execute("""Select distinct tp.idtipo_motor
+    from tipo_motor tp
+    inner join dispositivos d on tp.idtipo_motor = d.idmotor
+    Where idtipo_motor = %s """,(id))
+    inhabi = cur.fetchone()
+    
+    if inhabi:
+        flash('No se puede inhabilitar el motor porque está relacionado con otros registros.', 'warning')
         return redirect(url_for('ListMotor'))
-    except Exception  as e:
-        if '1451' in str(e):
-            flash('No se puede inhabilitar el motor porque está relacionado con otros registros.', 'warning')
-        else:
-            flash('Error al inhabilitar el motor: {}'.format(str(e)), 'warning')
-    finally:
-        cur.close()
-    return redirect(url_for('ListMotor'))
+    else:  
+        try:
+            cur=mysql.connection.cursor()
+            cur.execute('Update tipo_motor  set estado = 1 WHERE idtipo_motor = {0}'.format(id))
+            mysql.connection.commit()
+            cur.close()
+            flash('Motor inhabilitado exitosamente', 'success')
+            return redirect(url_for('ListMotor'))
+        except Exception  as e:
+            if '1451' in str(e):
+                flash('No se puede inhabilitar el motor porque está relacionado con otros registros.', 'warning')
+            else:
+                flash('Error al inhabilitar el motor: {}'.format(str(e)), 'warning')
+        finally:
+            cur.close()
+        return redirect(url_for('ListMotor'))
 
 
 
@@ -1078,21 +1125,32 @@ def addTipClient():
 #Inhabilitar
 @app.route('/InhabilTipClient/<string:id>', methods = ['POST','GET'])
 def InhaTipClient(id): 
-    try:
-        cur=mysql.connection.cursor()
-        cur.execute('Update tipo_clientes  set estado = 1 WHERE idtipo_clientes = {0}'.format(id))
-        mysql.connection.commit()
-        cur.close()
-        flash('Tipo Cliente inhabilitado exitosamente', 'success')
+    cur = mysql.connection.cursor()
+    cur.execute("""Select distinct idtipo_clientes
+    from tipo_clientes tp
+    inner join clientes d on tp.idtipo_clientes = d.tipo_cliente
+    Where tp.idtipo_clientes = %s """,(id))
+    inhabi = cur.fetchone()
+    
+    if inhabi:
+        flash('No se puede inhabilitar el tipo de cliente porque está relacionado con otros registros.', 'warning')
         return redirect(url_for('ListTipClient'))
-    except Exception  as e:
-        if '1451' in str(e):
-            flash('No se puede eliminar el tipo cliente porque está relacionado con otros registros.', 'warning')
-        else:
-            flash('Error al eliminar el cliente: {}'.format(str(e)), 'warning')
-    finally:
-        cur.close()
-    return redirect(url_for('ListTipClient'))
+    else:  
+        try:
+            cur=mysql.connection.cursor()
+            cur.execute('Update tipo_clientes  set estado = 1 WHERE idtipo_clientes = {0}'.format(id))
+            mysql.connection.commit()
+            cur.close()
+            flash('Tipo Cliente inhabilitado exitosamente', 'success')
+            return redirect(url_for('ListTipClient'))
+        except Exception  as e:
+            if '1451' in str(e):
+                flash('No se puede eliminar el tipo cliente porque está relacionado con otros registros.', 'warning')
+            else:
+                flash('Error al eliminar el cliente: {}'.format(str(e)), 'warning')
+        finally:
+            cur.close()
+        return redirect(url_for('ListTipClient'))
 
 #Metodos para tamaños de invernadero
 #Listar
@@ -1202,21 +1260,32 @@ def addTamanio():
 #Inhabilitar
 @app.route('/InhabilTamanio/<string:id>', methods = ['POST','GET'])
 def InhaTtamanio(id): 
-    try:
-        cur=mysql.connection.cursor()
-        cur.execute('Update tamanios_invernadero  set estado = 1 WHERE idtamanios = {0}'.format(id))
-        mysql.connection.commit()
-        cur.close()
-        flash('Tamaño inhabilitado exitosamente', 'success')
+    cur = mysql.connection.cursor()
+    cur.execute("""Select distinct tp.idtamanios
+    from tamanios_invernadero tp
+    inner join invernaderos d on tp.idtamanios = d.idtamanio
+    Where tp.idtamanios = %s """,(id))
+    inhabi = cur.fetchone()
+    
+    if inhabi:
+        flash('No se puede inhabilitar el tamaño porque está relacionado con otros registros.', 'warning')
         return redirect(url_for('ListTamanio'))
-    except Exception  as e:
-        if '1451' in str(e):
-            flash('No se puede inhabilitar el tamaño porque está relacionado con otros registros.', 'warning')
-        else:
-            flash('Error al inbailitar el tamaño: {}'.format(str(e)), 'warning')
-    finally:
-        cur.close()
-    return redirect(url_for('ListTamanio'))
+    else:   
+        try:
+            cur=mysql.connection.cursor()
+            cur.execute('Update tamanios_invernadero  set estado = 1 WHERE idtamanios = {0}'.format(id))
+            mysql.connection.commit()
+            cur.close()
+            flash('Tamaño inhabilitado exitosamente', 'success')
+            return redirect(url_for('ListTamanio'))
+        except Exception  as e:
+            if '1451' in str(e):
+                flash('No se puede inhabilitar el tamaño porque está relacionado con otros registros.', 'warning')
+            else:
+                flash('Error al inbailitar el tamaño: {}'.format(str(e)), 'warning')
+        finally:
+            cur.close()
+        return redirect(url_for('ListTamanio'))
 
 #Metodos para cultivos
 #Listar
@@ -1367,21 +1436,32 @@ def addCultivo():
 #Inhabilitar
 @app.route('/InhabilCultivo/<string:id>', methods = ['POST','GET'])
 def InhaCultivo(id): 
-    try:
-        cur=mysql.connection.cursor()
-        cur.execute('Update cultivos  set estado = 1 WHERE idcultivos = {0}'.format(id))
-        mysql.connection.commit()
-        cur.close()
-        flash('Cultivo inhabilitado exitosamente', 'success')
+    cur = mysql.connection.cursor()
+    cur.execute("""Select distinct tp.idcultivos
+    from cultivos tp
+    inner join invernaderos d on tp.idcultivos = d.idcultivo
+    Where tp.idcultivos = %s """,(id))
+    inhabi = cur.fetchone()
+    
+    if inhabi:
+        flash('No se puede inhabilitar el cultivo porque está relacionado con otros registros.', 'warning')
         return redirect(url_for('ListCultivo'))
-    except Exception  as e:
-        if '1451' in str(e):
-            flash('No se puede inhabilitar el Cultivo porque está relacionado con otros registros.', 'warning')
-        else:
-            flash('Error al inhabilitar el cliente: {}'.format(str(e)), 'warning')
-    finally:
-        cur.close()
-    return redirect(url_for('ListCultivo'))
+    else:   
+        try:
+            cur=mysql.connection.cursor()
+            cur.execute('Update cultivos  set estado = 1 WHERE idcultivos = {0}'.format(id))
+            mysql.connection.commit()
+            cur.close()
+            flash('Cultivo inhabilitado exitosamente', 'success')
+            return redirect(url_for('ListCultivo'))
+        except Exception  as e:
+            if '1451' in str(e):
+                flash('No se puede inhabilitar el Cultivo porque está relacionado con otros registros.', 'warning')
+            else:
+                flash('Error al inhabilitar el cliente: {}'.format(str(e)), 'warning')
+        finally:
+            cur.close()
+        return redirect(url_for('ListCultivo'))
 
 
 #Metodos para clientes
@@ -1401,7 +1481,7 @@ def ListClient():
                 inner join tipo_clientes tc on c.tipo_cliente = tc.idtipo_clientes""")
     data = cur.fetchall()
     
-    cur.execute('SELECT idtipo_clientes, tipo FROM tipo_clientes ')
+    cur.execute('SELECT idtipo_clientes, tipo FROM tipo_clientes where estado = 0')
     dataOpt = cur.fetchall()
     
     cur.close()
@@ -1433,7 +1513,7 @@ def updateCliente(id):
         cur.execute("""SELECT nombre_1, nombre_2, apellido_1, apellido_2, cedula, tipo_cliente, telefono, correo, estado
                     FROM clientes WHERE idclientes = %s""", (id,))
         repe = cur.fetchone()
-        cur.execute('SELECT idtipo_clientes, tipo FROM tipo_clientes ')
+        cur.execute('SELECT idtipo_clientes, tipo FROM tipo_clientes where estado = 0')
         dataOpt = cur.fetchall()
         cur.close()
         
@@ -1570,7 +1650,7 @@ def addClient():
                 from clientes c
                 inner join tipo_clientes tc on c.tipo_cliente = tc.idtipo_clientes""")
     data = cur.fetchall()
-    cur.execute('SELECT idtipo_clientes, tipo FROM tipo_clientes ')
+    cur.execute('SELECT idtipo_clientes, tipo FROM tipo_clientes where estado = 0')
     dataOpt = cur.fetchall()
     cur.close()
     
@@ -1655,21 +1735,32 @@ def addClient():
 #Inhabilitar
 @app.route('/InhabilCliente/<string:id>', methods = ['POST','GET'])
 def InhaCliente(id): 
-    try:
-        cur=mysql.connection.cursor()
-        cur.execute('Update clientes  set estado = 1 WHERE idclientes = {0}'.format(id))
-        mysql.connection.commit()
-        cur.close()
-        flash('Cliente inhabilitado exitosamente', 'success')
+    cur = mysql.connection.cursor()
+    cur.execute("""Select distinct tp.idclientes
+    from clientes tp
+    inner join invernaderos d on tp.idClientes = d.idcliente
+    Where tp.idclientes = %s """,(id,))
+    inhabi = cur.fetchone()
+    
+    if inhabi:
+        flash('No se puede inhabilitar el cliente porque está relacionado con otros registros.', 'warning')
         return redirect(url_for('ListClient'))
-    except Exception  as e:
-        if '1451' in str(e):
-            flash('No se puede eliminar el cliente porque está relacionado con otros registros.', 'warning')
-        else:
-            flash('Error al eliminar el cliente: {}'.format(str(e)), 'warning')
-    finally:
-        cur.close()
-    return redirect(url_for('ListClient'))
+    else:   
+        try:
+            cur=mysql.connection.cursor()
+            cur.execute('Update clientes  set estado = 1 WHERE idclientes = {0}'.format(id))
+            mysql.connection.commit()
+            cur.close()
+            flash('Cliente inhabilitado exitosamente', 'success')
+            return redirect(url_for('ListClient'))
+        except Exception  as e:
+            if '1451' in str(e):
+                flash('No se puede eliminar el cliente porque está relacionado con otros registros.', 'warning')
+            else:
+                flash('Error al eliminar el cliente: {}'.format(str(e)), 'warning')
+        finally:
+            cur.close()
+        return redirect(url_for('ListClient'))
 
 
 #Metodos para dispositivos
@@ -1689,13 +1780,13 @@ def ListDispo():
                 inner join tipo_iluminacion ti on ti.idtipo_iluminacion = d.idiluminacion""")
     data = cur.fetchall()
     
-    cur.execute('SELECT idarduinos, arduino FROM tipo_arduino ')
+    cur.execute('SELECT idarduinos, arduino FROM tipo_arduino where estado = 0')
     dataOpt = cur.fetchall()
-    cur.execute('SELECT idaccesorios, accesorios FROM tipo_sensor ')
+    cur.execute('SELECT idaccesorios, accesorios FROM tipo_sensor where estado = 0')
     dataOpt2 = cur.fetchall()
-    cur.execute('SELECT idtipo_motor, tipo_motor FROM tipo_motor ')
+    cur.execute('SELECT idtipo_motor, tipo_motor FROM tipo_motor where estado = 0')
     dataOpt3 = cur.fetchall()
-    cur.execute('SELECT idtipo_iluminacion, iluminacion FROM tipo_iluminacion ')
+    cur.execute('SELECT idtipo_iluminacion, iluminacion FROM tipo_iluminacion where estado = 0')
     dataOpt4 = cur.fetchall()
     
     
@@ -1726,13 +1817,13 @@ def addDispo():
                 inner join tipo_iluminacion ti on ti.idtipo_iluminacion = d.idiluminacion""")
     data = cur.fetchall()
     
-    cur.execute('SELECT idarduinos, arduino FROM tipo_arduino ')
+    cur.execute('SELECT idarduinos, arduino FROM tipo_arduino where estado = 0')
     dataOpt = cur.fetchall()
-    cur.execute('SELECT idaccesorios, accesorios FROM tipo_sensor ')
+    cur.execute('SELECT idaccesorios, accesorios FROM tipo_sensor where estado = 0')
     dataOpt2 = cur.fetchall()
-    cur.execute('SELECT idtipo_motor, tipo_motor FROM tipo_motor ')
+    cur.execute('SELECT idtipo_motor, tipo_motor FROM tipo_motor where estado = 0')
     dataOpt3 = cur.fetchall()
-    cur.execute('SELECT idtipo_iluminacion, iluminacion FROM tipo_iluminacion ')
+    cur.execute('SELECT idtipo_iluminacion, iluminacion FROM tipo_iluminacion where estado = 0')
     dataOpt4 = cur.fetchall()
     cur.close()
     
@@ -1803,13 +1894,13 @@ def updateDispo(id):
                 inner join tipo_iluminacion ti on ti.idtipo_iluminacion = d.idiluminacion""")
         data = cur.fetchall()
         
-        cur.execute('SELECT idarduinos, arduino FROM tipo_arduino ')
+        cur.execute('SELECT idarduinos, arduino FROM tipo_arduino where estado = 0')
         dataOpt = cur.fetchall()
-        cur.execute('SELECT idaccesorios, accesorios FROM tipo_sensor ')
+        cur.execute('SELECT idaccesorios, accesorios FROM tipo_sensor where estado = 0')
         dataOpt2 = cur.fetchall()
-        cur.execute('SELECT idtipo_motor, tipo_motor FROM tipo_motor ')
+        cur.execute('SELECT idtipo_motor, tipo_motor FROM tipo_motor where estado = 0')
         dataOpt3 = cur.fetchall()
-        cur.execute('SELECT idtipo_iluminacion, iluminacion FROM tipo_iluminacion ')
+        cur.execute('SELECT idtipo_iluminacion, iluminacion FROM tipo_iluminacion where estado = 0')
         dataOpt4 = cur.fetchall()
         cur.close()
         
@@ -1876,21 +1967,32 @@ def deleteDispo(id):
 #Inhabilitar
 @app.route('/InhabilDispo/<string:id>', methods = ['POST','GET'])
 def InhaDispo(id):
-    try:
-        cur=mysql.connection.cursor()
-        cur.execute('Update dispositivos  set estado = 1 WHERE iddispositivo = {0}'.format(id))
-        mysql.connection.commit()
-        cur.close()
-        flash('El dispositivo se ha inhabilitado exitosamente', 'success')
+    cur = mysql.connection.cursor()
+    cur.execute("""Select distinct tp.iddispositivo
+    from dispositivos tp
+    inner join invernaderos d on tp.iddispositivo = d.iddispositivo
+    Where tp.iddispositivo = %s """,(id,))
+    inhabi = cur.fetchone()
+    
+    if inhabi:
+        flash('No se puede inhabilitar el dispositivo porque está relacionado con otros registros.', 'warning')
         return redirect(url_for('ListDispo'))
-    except Exception  as e:
-        if '1451' in str(e):
-            flash('No se puede inhabilitar el dispositivo porque está relacionado con otros registros.', 'warning')
-        else:
-            flash('Error al inhabilitar el dispositivo: {}'.format(str(e)), 'warning')
-    finally:
-        cur.close()
-    return redirect(url_for('ListDispo'))
+    else:
+        try:
+            cur=mysql.connection.cursor()
+            cur.execute('Update dispositivos  set estado = 1 WHERE iddispositivo = {0}'.format(id))
+            mysql.connection.commit()
+            cur.close()
+            flash('El dispositivo se ha inhabilitado exitosamente', 'success')
+            return redirect(url_for('ListDispo'))
+        except Exception  as e:
+            if '1451' in str(e):
+                flash('No se puede inhabilitar el dispositivo porque está relacionado con otros registros.', 'warning')
+            else:
+                flash('Error al inhabilitar el dispositivo: {}'.format(str(e)), 'warning')
+        finally:
+            cur.close()
+        return redirect(url_for('ListDispo'))
 
 #Metodos para tipo_invernadero
 #Listar
@@ -2006,21 +2108,32 @@ def updateTipInv(id):
 #Inhabilitar
 @app.route('/InhabilTipInv/<string:id>', methods = ['POST','GET'])
 def InhaTipInv(id):
-    try:
-        cur=mysql.connection.cursor()
-        cur.execute('Update tipo_invernadero  set estado = 1 WHERE idtipo_invernadero = {0}'.format(id))
-        mysql.connection.commit()
-        cur.close()
-        flash('Tipo Invernadero inhabilitado exitosamente', 'success')
+    cur = mysql.connection.cursor()
+    cur.execute("""Select distinct tp.idtipo_invernadero
+    from tipo_invernadero tp
+    inner join invernaderos d on tp.idtipo_invernadero = d.tipo_invernadero
+    Where tp.idtipo_invernadero = %s """,(id,))
+    inhabi = cur.fetchone()
+    
+    if inhabi:
+        flash('No se puede inhabilitar el tipo invernadero porque está relacionado con otros registros.', 'warning')
         return redirect(url_for('ListTipInve'))
-    except Exception  as e:
-        if '1451' in str(e):
-            flash('No se puede inhabilitar el tipo invernadero porque está relacionado con otros registros.', 'warning')
-        else:
-            flash('Error al inhabilitar el tipo de invernadero: {}'.format(str(e)), 'warning')
-    finally:
-        cur.close()
-    return redirect(url_for('ListTipInve'))
+    else:
+        try:
+            cur=mysql.connection.cursor()
+            cur.execute('Update tipo_invernadero  set estado = 1 WHERE idtipo_invernadero = {0}'.format(id))
+            mysql.connection.commit()
+            cur.close()
+            flash('Tipo Invernadero inhabilitado exitosamente', 'success')
+            return redirect(url_for('ListTipInve'))
+        except Exception  as e:
+            if '1451' in str(e):
+                flash('No se puede inhabilitar el tipo invernadero porque está relacionado con otros registros.', 'warning')
+            else:
+                flash('Error al inhabilitar el tipo de invernadero: {}'.format(str(e)), 'warning')
+        finally:
+            cur.close()
+        return redirect(url_for('ListTipInve'))
 
 
 #Metodos para tipo_iluminacion
@@ -2137,21 +2250,32 @@ def updateTipIlum(id):
 #Inhabilitar
 @app.route('/InhabilTipIlum/<string:id>', methods = ['POST','GET'])
 def InhaTipIlum(id):
-    try:
-        cur=mysql.connection.cursor()
-        cur.execute('Update tipo_iluminacion  set estado = 1 WHERE idtipo_iluminacion = {0}'.format(id))
-        mysql.connection.commit()
-        cur.close()
-        flash('Tipo de iluminación inhabilitado exitosamente', 'success')
+    cur = mysql.connection.cursor()
+    cur.execute("""Select distinct tp.idtipo_iluminacion
+    from tipo_iluminacion tp
+    inner join dispositivos d on tp.idtipo_iluminacion = d.idiluminacion
+    Where idtipo_iluminacion = %s """,(id))
+    inhabi = cur.fetchone()
+    
+    if inhabi:
+        flash('No se puede inhabilitar el tipo de iluminación porque está relacionado con otros registros.', 'warning')
         return redirect(url_for('ListTipIlum'))
-    except Exception  as e:
-        if '1451' in str(e):
-            flash('No se puede inhabilitar el tipo de iluminación porque está relacionado con otros registros.', 'warning')
-        else:
-            flash('Error al inhabilitar el tipo de iluminación: {}'.format(str(e)), 'warning')
-    finally:
-        cur.close()
-    return redirect(url_for('ListTipIlum'))
+    else:  
+        try:
+            cur=mysql.connection.cursor()
+            cur.execute('Update tipo_iluminacion  set estado = 1 WHERE idtipo_iluminacion = {0}'.format(id))
+            mysql.connection.commit()
+            cur.close()
+            flash('Tipo de iluminación inhabilitado exitosamente', 'success')
+            return redirect(url_for('ListTipIlum'))
+        except Exception  as e:
+            if '1451' in str(e):
+                flash('No se puede inhabilitar el tipo de iluminación porque está relacionado con otros registros.', 'warning')
+            else:
+                flash('Error al inhabilitar el tipo de iluminación: {}'.format(str(e)), 'warning')
+        finally:
+            cur.close()
+        return redirect(url_for('ListTipIlum'))
 
 
 
@@ -2173,15 +2297,15 @@ def ListInverna():
                 inner join tipo_invernadero ti2 on i.tipo_invernadero = ti2.idtipo_invernadero""")
     data = cur.fetchall()
     
-    cur.execute('SELECT idcultivos, cultivo FROM cultivos ')
+    cur.execute('SELECT idcultivos, cultivo FROM cultivos where estado = 0')
     dataOpt = cur.fetchall()
-    cur.execute('SELECT idclientes, cedula FROM clientes ')
+    cur.execute('SELECT idclientes, cedula FROM clientes where estado = 0')
     dataOpt2 = cur.fetchall()
-    cur.execute('SELECT iddispositivo, nombre FROM dispositivos ')
+    cur.execute('SELECT iddispositivo, nombre FROM dispositivos where estado = 0')
     dataOpt3 = cur.fetchall()
-    cur.execute('SELECT idtamanios, tamanio FROM tamanios_invernadero ')
+    cur.execute('SELECT idtamanios, tamanio FROM tamanios_invernadero where estado = 0')
     dataOpt4 = cur.fetchall()
-    cur.execute('SELECT idtipo_invernadero, tipo_invernadero FROM tipo_invernadero ')
+    cur.execute('SELECT idtipo_invernadero, tipo_invernadero FROM tipo_invernadero where estado = 0')
     dataOpt5 = cur.fetchall()
     
     cur.close()
@@ -2214,15 +2338,15 @@ def addInverna():
                 inner join tipo_invernadero ti2 on i.tipo_invernadero = ti2.idtipo_invernadero""")
     data = cur.fetchall()
     
-    cur.execute('SELECT idcultivos, cultivo FROM cultivos ')
+    cur.execute('SELECT idcultivos, cultivo FROM cultivos where estado = 0')
     dataOpt = cur.fetchall()
-    cur.execute('SELECT idclientes, cedula FROM clientes ')
+    cur.execute('SELECT idclientes, cedula FROM clientes where estado = 0')
     dataOpt2 = cur.fetchall()
-    cur.execute('SELECT iddispositivo, nombre FROM dispositivos ')
+    cur.execute('SELECT iddispositivo, nombre FROM dispositivos where estado = 0')
     dataOpt3 = cur.fetchall()
-    cur.execute('SELECT idtamanios, tamanio FROM tamanios_invernadero ')
+    cur.execute('SELECT idtamanios, tamanio FROM tamanios_invernadero where estado = 0')
     dataOpt4 = cur.fetchall()
-    cur.execute('SELECT idtipo_invernadero, tipo_invernadero FROM tipo_invernadero ')
+    cur.execute('SELECT idtipo_invernadero, tipo_invernadero FROM tipo_invernadero where estado = 0')
     dataOpt5 = cur.fetchall()
     cur.close()
     
@@ -2337,15 +2461,15 @@ def updateInverna(id):
         data = cur.fetchall()
         cur.execute("""select *  from invernaderos WHERE idinvernaderos = %s""", (id,))
         repe = cur.fetchone()
-        cur.execute('SELECT idcultivos, cultivo FROM cultivos ')
+        cur.execute('SELECT idcultivos, cultivo FROM cultivos where estado = 0')
         dataOpt = cur.fetchall()
-        cur.execute('SELECT idclientes, cedula FROM clientes ')
+        cur.execute('SELECT idclientes, cedula FROM clientes where estado = 0')
         dataOpt2 = cur.fetchall()
-        cur.execute('SELECT iddispositivo, nombre FROM dispositivos ')
+        cur.execute('SELECT iddispositivo, nombre FROM dispositivos where estado = 0')
         dataOpt3 = cur.fetchall()
-        cur.execute('SELECT idtamanios, tamanio FROM tamanios_invernadero ')
+        cur.execute('SELECT idtamanios, tamanio FROM tamanios_invernadero where estado = 0')
         dataOpt4 = cur.fetchall()
-        cur.execute('SELECT idtipo_invernadero, tipo_invernadero FROM tipo_invernadero ')
+        cur.execute('SELECT idtipo_invernadero, tipo_invernadero FROM tipo_invernadero where estado = 0')
         dataOpt5 = cur.fetchall()
         cur.close()
 

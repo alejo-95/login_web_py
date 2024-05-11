@@ -49,9 +49,9 @@
                         {%endif%}
                         {%endwith%}
                         <div class="form-group mb-3 modalForm">
-                            <label for="exampleInputEmail1">Accesorio</label>
+                            <label for="exampleInputEmail1">Sensor</label>
                             <input type="text" class="form-control" id="usertxt" aria-describedby="emailHelp"
-                                placeholder="Ingrese el accesorio" name="txtAcce" value="{{acceTxt}}">
+                                placeholder="Ingrese el sensor" name="txtAcce" value="{{acceTxt}}">
                             {%with messages = get_flashed_messages(with_categories=true)%}
                             {%if messages and acceErr%}
                             {% for category, message in messages %}
@@ -113,7 +113,7 @@
             <thead>
                 <tr class="table_u ">
                     <th>ID</th>
-                    <th>Accesorio</th>
+                    <th>Sensor</th>
                     <th>Estado</th>
                     <th>Acción</th>
                 </tr>
@@ -154,9 +154,9 @@
                                     {%endif%}
                                     {%endwith%}
                                     <div class="form-group mb-3 modalForm">
-                                        <label for="exampleInputEmail1">Accesorio</label>
+                                        <label for="exampleInputEmail1">Sensor</label>
                                         <input type="text" class="form-control" id="exampleInputEmail1"
-                                            aria-describedby="emailHelp" placeholder="Ingrese Accesorio" name="txtAcce"
+                                            aria-describedby="emailHelp" placeholder="Ingrese sensor" name="txtAcce"
                                             value="{{data.accesorios}}">
                                             {%with messages = get_flashed_messages(with_categories=true)%}
                                             {%if messages and acceErrEdit%}
