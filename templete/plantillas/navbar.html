@@ -1,19 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="../static/styles/styleMenu.css">
-</head>
-
-<body class="index-body">
-
-    <header>
-        <a href="/admin" class="logo">TERMOCULTIVA</a>
-
-        <nav class="navbar">
+        <nav class="navbarr">
             <ul>
                 <li><a href="#">Clientes</a>
                     <ul>
@@ -48,11 +34,6 @@
                         {%endif%}
                     </ul>
                 </li>
-                <li><a href="#">Informes</a>
-                    <ul>
-                        <li><a href="/historico">Histórico</a></li>                      
-                    </ul>
-                </li>
                 <li>
                     <a href="#">Configuración</a>
                     <ul>
@@ -60,19 +41,9 @@
                         {% if 'idperfil' in session and session['idperfil'] == 1 %}
                         <li><a href="/listar-perfiles">Gestionar Perfiles</a></li>
                         {%endif%}
-                        
                     </ul>
                 </li>
                 <li><a href="/logout">Salir</a>
                 </li>
             </ul>
         </nav>
-    </header>
-
-
-
-    
-</body>
-
-
-</html>

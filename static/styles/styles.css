@@ -18,6 +18,9 @@
 .btn-inhabi{
     color: #dfce35;
 }
+.btn-habi{
+    color: rgb(26, 141, 78);
+}
 
 .reaload-act{
     color:  rgb(26, 141, 78);
@@ -71,4 +74,21 @@
 
 .btn-inhabi{
     color: #dfce35;
+}
+
+div.dt-buttons {
+    margin-bottom: 1px; /* Ajusta este valor según sea necesario */
+}
+
+.dt-button {
+    background-color: #007bff; /* Color de fondo */
+    color: white; /* Color del texto */
+    border: none; /* Sin bordes */
+    padding: 5px 10px; /* Espaciado interno */
+    margin-right: 5px; /* Espaciado entre botones */
+    border-radius: 4px; /* Bordes redondeados */
+}
+
+.dataTables_wrapper .dataTables_filter {
+    margin-bottom: 0;
 }

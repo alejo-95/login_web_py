@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask import render_template, redirect, request, Response, session, url_for, flash
 from flask_mysqldb import MySQL
 #from app import app, mysql
@@ -701,17 +701,31 @@ def InhaAcce(id):
     Where idaccesorios = %s """,(id))
     inhabi = cur.fetchone()
     
+    cur.execute("""
+    Select distinct idaccesorios, estado
+    from tipo_sensor tp  
+    Where idaccesorios = %s """,(id))
+    status = cur.fetchone()
+    
     if inhabi:
         flash('No se puede inhabilitar el accesorio porque está relacionado con otros registros.', 'warning')
         return redirect(url_for('ListAcce'))
     else:   
         try:
-            cur=mysql.connection.cursor()
-            cur.execute('Update tipo_sensor  set estado = 1 WHERE idaccesorios = {0}'.format(id))
-            mysql.connection.commit()
-            cur.close()
-            flash('Accesorio inhabilitado exitosamente', 'success')
-            return redirect(url_for('ListAcce'))
+            if status['estado'] == 0:
+                cur=mysql.connection.cursor()
+                cur.execute('Update tipo_sensor  set estado = 1 WHERE idaccesorios = {0}'.format(id))
+                mysql.connection.commit()
+                cur.close()
+                flash('Accesorio inhabilitado exitosamente', 'success')
+                return redirect(url_for('ListAcce'))
+            if status['estado'] == 1:
+                cur=mysql.connection.cursor()
+                cur.execute('Update tipo_sensor  set estado = 0 WHERE idaccesorios = {0}'.format(id))
+                mysql.connection.commit()
+                cur.close()
+                flash('Accesorio habilitado exitosamente', 'success')
+                return redirect(url_for('ListAcce'))
         except Exception  as e:
             if '1451' in str(e):
                 flash('No se puede eliminar el accesorio porque está relacionado con otros registros.', 'warning')
@@ -2177,7 +2191,7 @@ def addTipIlum():
 
         try:
             cur = mysql.connection.cursor()
-            cur.execute("INSERT INTO tipo_invernadero (tipo_invernadero, estado) VALUES (%s, %s)", (tip, state))
+            cur.execute("INSERT INTO tipo_iluminacion (iluminacion, estado) VALUES (%s, %s)", (tip, state))
             mysql.connection.commit()
             flash('Tipo de iluminación agregado con exito', 'success')
             return redirect(url_for('ListTipIlum'))
@@ -2251,23 +2265,37 @@ def updateTipIlum(id):
 @app.route('/InhabilTipIlum/<string:id>', methods = ['POST','GET'])
 def InhaTipIlum(id):
     cur = mysql.connection.cursor()
-    cur.execute("""Select distinct tp.idtipo_iluminacion
+    cur.execute("""Select distinct tp.idtipo_iluminacion, tp.estado
     from tipo_iluminacion tp
     inner join dispositivos d on tp.idtipo_iluminacion = d.idiluminacion
     Where idtipo_iluminacion = %s """,(id))
     inhabi = cur.fetchone()
+    
+    cur.execute("""
+        Select distinct idtipo_iluminacion, estado
+        from prueba.tipo_iluminacion tp  
+        Where idtipo_iluminacion = %s """,(id))
+    status = cur.fetchone()
     
     if inhabi:
         flash('No se puede inhabilitar el tipo de iluminación porque está relacionado con otros registros.', 'warning')
         return redirect(url_for('ListTipIlum'))
     else:  
         try:
-            cur=mysql.connection.cursor()
-            cur.execute('Update tipo_iluminacion  set estado = 1 WHERE idtipo_iluminacion = {0}'.format(id))
-            mysql.connection.commit()
-            cur.close()
-            flash('Tipo de iluminación inhabilitado exitosamente', 'success')
-            return redirect(url_for('ListTipIlum'))
+            if status['estado'] == 0:
+                cur=mysql.connection.cursor()
+                cur.execute('Update tipo_iluminacion  set estado = 1 WHERE idtipo_iluminacion = {0}'.format(id))
+                mysql.connection.commit()
+                cur.close()
+                flash('Tipo de iluminación inhabilitado exitosamente', 'success')
+                return redirect(url_for('ListTipIlum'))
+            if  status['estado'] == 1:
+                cur=mysql.connection.cursor()
+                cur.execute('Update tipo_iluminacion  set estado = 0 WHERE idtipo_iluminacion = {0}'.format(id))
+                mysql.connection.commit()
+                cur.close()
+                flash('Tipo de iluminación habilitado exitosamente', 'success')
+                return redirect(url_for('ListTipIlum'))
         except Exception  as e:
             if '1451' in str(e):
                 flash('No se puede inhabilitar el tipo de iluminación porque está relacionado con otros registros.', 'warning')
@@ -2631,6 +2659,97 @@ def ListTemp():
     return render_template('temperaturas/temperaturas.html', temp = data)
 
 
+#Metodo para informe
+#renderizar
+@app.route('/historico')
+def index():
+    return render_template('dashboard/historico.html')
+
+@app.route('/historico/data')
+def data():
+    try:
+        with mysql.connection.cursor() as cur:
+            # Consulta para obtener todos los datos
+            cur.execute("""
+                SELECT
+                    DATE_FORMAT(fecha_temperatura, '%Y-%m-%d %H:%i:00') AS day_minut,
+                    ROUND(AVG(datos_temperaturas), 2) AS avg_temp
+                FROM
+                    prueba.datos_temperaturas
+                WHERE
+                    fecha_temperatura LIKE '2024-05-04%'
+                GROUP BY
+                    day_minut
+                ORDER BY
+                    day_minut
+            """)
+            rows = cur.fetchall()
+            print("All Data:", rows)  # Depuración
+
+            if not rows:
+                return jsonify({'error': 'No data found for all temperatures'})
+
+            data_all = {
+                'labels': [row['day_minut'] for row in rows],
+                'values': [row['avg_temp'] for row in rows]
+            }
+
+            # Consulta para obtener la temperatura máxima
+            cur.execute("""
+                SELECT
+                    DATE_FORMAT(fecha_temperatura, '%Y-%m-%d %H:%i:00') AS day_minut,
+                    ROUND(AVG(datos_temperaturas), 2) AS avg_temp
+                FROM
+                    prueba.datos_temperaturas
+                WHERE
+                    fecha_temperatura LIKE '2024-05-04%'
+                GROUP BY
+                    day_minut
+                ORDER BY
+                    avg_temp DESC
+                LIMIT 1
+            """)
+            rowsMax = cur.fetchall()
+            
+
+            if not rowsMax:
+                return jsonify({'error': 'No data found for max temperature'})
+
+            data_max = {
+                'labels': [row['day_minut'] for row in rowsMax],
+                'values': [row['avg_temp'] for row in rowsMax]
+            }
+
+            # Consulta para obtener la temperatura mínima
+            cur.execute("""
+                SELECT
+                    DATE_FORMAT(fecha_temperatura, '%Y-%m-%d %H:%i:00') AS day_minut,
+                    ROUND(AVG(datos_temperaturas), 2) AS avg_temp
+                FROM
+                    prueba.datos_temperaturas
+                WHERE
+                    fecha_temperatura LIKE '2024-05-04%'
+                GROUP BY
+                    day_minut
+                ORDER BY
+                    avg_temp
+                LIMIT 1
+            """)
+            rowsMin = cur.fetchall()
+            
+
+            if not rowsMin:
+                return jsonify({'error': 'No data found for min temperature'})
+
+            data_min = {
+                'labels': [row['day_minut'] for row in rowsMin],
+                'values': [row['avg_temp'] for row in rowsMin]
+            }
+
+        return jsonify({'all': data_all, 'max': data_max, 'min': data_min})
+
+    except Exception as e:
+        return jsonify({'error': str(e)})
 
 
 

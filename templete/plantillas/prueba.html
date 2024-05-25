@@ -4,34 +4,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" 
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.3/css/dataTables.bootstrap5.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css">
-    <link rel="stylesheet" href="../../static/styles/styles.css">
-    <link rel="stylesheet" href="../../static/styles/styleNavbar.css">
-
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
-    <script src="https://cdn.datatables.net/2.0.3/js/dataTables.bootstrap5.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
-    <script src="../../static/script.js"></script>
-
-
-    <title>Termocultiva</title>
+    <title>Document</title>
+    <link rel="stylesheet" href="../static/styles/styleMenu.css">
 </head>
 
-<body accesskey="">
+<body class="index-body">
+
+    <header>
+        <a href="/admin" class="logo">TERMOCULTIVA</a>
+
+        <nav class="navbar">
+            <ul>
+                <li><a href="#">Clientes</a>
+                    <ul>
+                        <li><a href="/listar-clientes">Gestionar Clientes</a></li>
+                        {% if 'idperfil' in session and session['idperfil'] == 1 %}
+                        <li><a href="/listar-tipClient">Gestionar Tipo Cliente</a></li>
+                        {%endif%}
+                    </ul>
+                </li>
+                <li><a href="#">Invernaderos</a>
+                    <ul>
+                        <li><a href="/listar-invernaderos">Gestionar Invernadero</a></li>
+                        {% if 'idperfil' in session and session['idperfil'] == 1 %}
+                        <li><a href="/listar-tipInve">Gestionar Tipo Invernadero</a></li>
+                        <li><a href="/listar-tamanio">Gestionar Tamaños de Invernadero</a></li>
+                        {%endif%}
+                        <li><a href="/listar-cultivos">Gestionar Cultivos</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">Temperatura</a>
+                    <ul>
+                        <li><a href="/listar-temp">Gestión Temperaura</a></li>
+                    </ul>
+                <li><a href="#">Dispositivos</a>
+                    <ul>
+                        <li><a href="/listar-dispositivos">Gestionar Dispositivos</a></li>
+                        {% if 'idperfil' in session and session['idperfil'] == 1 %}
+                        <li><a href="/listar-ard">Gestionar Arduinos</a></li>
+                        <li><a href="/listar-acce">Gestionar Sensores</a></li>
+                        <li><a href="/listar-mot">Gestionar Motores</a></li>
+                        <li><a href="/listar-tipIlum">Gestionar Iluminación</a></li>
+                        {%endif%}
+                    </ul>
+                </li>
+                <li>
+                    <a href="#">Configuración</a>
+                    <ul>
+                        <li id="user"><a href="/listar-usuarios">Gestionar Usuarios</a></li>
+                        {% if 'idperfil' in session and session['idperfil'] == 1 %}
+                        <li><a href="/listar-perfiles">Gestionar Perfiles</a></li>
+                        {%endif%}
+                    </ul>
+                </li>
+                <li><a href="/logout">Salir</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
 
     <div id="perfilModal" class="modal fade" role="dialog" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-scrollable">
@@ -39,14 +69,14 @@
 
                 <div class="modal-header">
                     <h5 class="modal-title text-primary new_title">
-                        Por favor cree un nuevo tipo de invernadero
+                        Por favor cree una nueva iluminación
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" title="exit">
                     </button>
                 </div>
 
 
-                <form action="/add-tipInv" method="POST">
+                <form action="/add-tipIlum" method="POST">
                     <div class="modal-body" class="form-control form-login-register">
                         {%with messages = get_flashed_messages(with_categories=true)%}
                         {%if messages and dupliErr%}
@@ -57,11 +87,11 @@
                         {%endif%}
                         {%endwith%}
                         <div class="form-group mb-3 modalForm">
-                            <label for="exampleInputEmail1">Tipo de invernadero</label>
+                            <label for="exampleInputEmail1">Iluminación</label>
                             <input type="text" class="form-control" id="usertxt" aria-describedby="emailHelp"
-                                placeholder="Ingrese el tipo invernadero" name="txtTip" value="{{tipe}}">
+                                placeholder="Ingrese el nombre de iluminación" name="txtTip" value="{{acceTxt}}">
                             {%with messages = get_flashed_messages(with_categories=true)%}
-                            {%if messages and tipErr%}
+                            {%if messages and acceErr%}
                             {% for category, message in messages %}
                             <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
                                 {{message}}</div>
@@ -94,13 +124,13 @@
 
         <div>
             <h3 class="text-center title_module">
-                Gestión tipo invernadero
+                Gestión iluminación
             </h3>
         </div>
 
         <div class="mb-3">
-            <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#perfilModal"> Nuevo tipo
-                invernadero</button>
+            <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#perfilModal"> Nuevo
+                sensor</button>
         </div>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -121,7 +151,7 @@
             <thead>
                 <tr class="table_u ">
                     <th>ID</th>
-                    <th>Tipo Cliente</th>
+                    <th>Iluminacion</th>
                     <th>Estado</th>
                     <th>Acción</th>
                 </tr>
@@ -129,55 +159,56 @@
             <tbody>
                 {% for data in tip %}
                 <tr>
-                    <td>{{data.idtipo_invernadero}}</th>
-                    <td>{{data.tipo_invernadero}}</td>
+                    <td>{{data.idtipo_iluminacion}}</th>
+                    <td>{{data.iluminacion}}</td>
                     <td>{{data.status}}</td>
                     <td class="text-center">
-                        <a href="/updateTipInv/{{data.idtipo_invernadero}}" class="bi-pencil-fill edit_action"
-                            title="edit" data-bs-toggle="modal"
-                            data-bs-target="#editModal{{data.idtipo_invernadero}}"></a>
-                        <a href="/InhabilTipInv/{{data.idtipo_invernadero}}" class="bi bi-ban btn-inhabi" title="Inhabilitar"></a>
-                        <a href="/deleteTipInv/{{data.idtipo_invernadero}}" class="bi-eraser-fill btn-delete"
+                        <a href="/updateTipIlum/{{data.idtipo_iluminacion}}" class="bi-pencil-fill edit_action" title="edit"
+                            data-bs-toggle="modal" data-bs-target="#editModal{{data.idtipo_iluminacion}}"></a>
+                        {%if data.status == 'Habilitado'%}
+                        <a href="/InhabilTipIlum/{{data.idtipo_iluminacion}}" class="bi bi-ban btn-inhabi" title="Inhabilitar"></a>
+                        {%endif%}
+                        {%if data.status == 'Deshabilitado'%}
+                        <a href="/InhabilTipIlum/{{data.idtipo_iluminacion}}" class="bi bi-check-circle btn-habi" title="Habilitar"></a>
+                        {%endif%}
+                        <a href="/deleteTipIlum/{{data.idtipo_iluminacion}}" class="bi-eraser-fill btn-delete"
                             title="delete"></a>
                     </td>
                 </tr>
 
                 <!-- Edicion -->
-                <div class="modal fade" id="editModal{{data.idtipo_invernadero}}" data-bs-backdrop="static"
-                    role="dialog">
+                <div class="modal fade" id="editModal{{data.idtipo_iluminacion}}" data-bs-backdrop="static" role="dialog">
                     <div class="modal-dialog modal-dialog-scrollable">
 
                         <div class="modal-content">
 
                             <div class="modal-header">
-                                <h5>Editar Tipo Invernadero</h5>
+                                <h5>Editar iluminación</h5>
                                 <button class="btn-close" data-bs-dismiss="modal" title="exit"></button>
                             </div>
-                            <form action="/updateTipInv/{{data.idtipo_invernadero}}" method="POST">
+                            <form action="/updateTipIlum/{{data.idtipo_iluminacion}}" method="POST">
                                 <div class="modal-body" class="form-control form-login-register">
                                     {%with messages = get_flashed_messages(with_categories=true)%}
-                                    {%if messages and dupliErr%}
+                                    {%if messages and dupliErrEdit%}
                                     {% for category, message in messages %}
                                     <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
-                                        {{message}}
-                                    </div>
+                                        {{message}}</div>
                                     {%endfor%}
                                     {%endif%}
                                     {%endwith%}
                                     <div class="form-group mb-3 modalForm">
-                                        <label for="exampleInputEmail1">Tipo Cliente</label>
+                                        <label for="exampleInputEmail1">Iluminación</label>
                                         <input type="text" class="form-control" id="exampleInputEmail1"
-                                            aria-describedby="emailHelp" placeholder="Ingrese tipo de invernadero"
-                                            name="txtTip" value="{{data.tipo_invernadero}}">
-                                        {%with messages = get_flashed_messages(with_categories=true)%}
-                                        {%if messages and tipErr%}
-                                        {% for category, message in messages %}
-                                        <div class="alert alert-{{category}} alert-dismissible fade show mt-3"
-                                            role="alert">
-                                            {{message}}</div>
-                                        {%endfor%}
-                                        {%endif%}
-                                        {%endwith%}
+                                            aria-describedby="emailHelp" placeholder="Ingrese nombre de iluminación" name="txtTip"
+                                            value="{{data.iluminacion}}">
+                                            {%with messages = get_flashed_messages(with_categories=true)%}
+                                            {%if messages and acceErrEdit%}
+                                            {% for category, message in messages %}
+                                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
+                                                {{message}}</div>
+                                            {%endfor%}
+                                            {%endif%}
+                                            {%endwith%}
                                     </div>
                                     <!-- <div class="form-group mb-4 modalForm">
                                         <label for="exampleInputPassword1">Estado</label>
@@ -221,6 +252,7 @@
                 });
             })
         }
+        
         const btninhabili = document.querySelectorAll('.btn-inhabi');
         if (btninhabili) {
             const btnArray = Array.from(btninhabili);
@@ -232,10 +264,12 @@
                 });
             })
         }
+
     </script>
+
     {% if add_modal %}
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             $('#perfilModal').modal('show');
         });
     </script>
@@ -243,12 +277,20 @@
 
     {% if edit_modal %}
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             $('#editModal{{edit_modal}}').modal('show');
         });
     </script>
     {% endif %}
 
+
+
+
+
+
+
+    
 </body>
+
 
 </html>

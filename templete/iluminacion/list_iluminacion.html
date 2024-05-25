@@ -4,19 +4,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
-        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" 
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/2.0.3/css/dataTables.bootstrap5.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css">
     <link rel="stylesheet" href="../../static/styles/styles.css">
-
+    <link rel="stylesheet" href="../../static/styles/styleNavbar.css">
 
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.0.3/js/dataTables.bootstrap5.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
     <script src="../../static/script.js"></script>
 
 
@@ -31,7 +39,7 @@
 
                 <div class="modal-header">
                     <h5 class="modal-title text-primary new_title">
-                        Por favor cree un nuevo sensor
+                        Por favor cree una nueva iluminación
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" title="exit">
                     </button>
@@ -49,9 +57,9 @@
                         {%endif%}
                         {%endwith%}
                         <div class="form-group mb-3 modalForm">
-                            <label for="exampleInputEmail1">Accesorio</label>
+                            <label for="exampleInputEmail1">Iluminación</label>
                             <input type="text" class="form-control" id="usertxt" aria-describedby="emailHelp"
-                                placeholder="Ingrese el accesorio" name="txtAcce" value="{{acceTxt}}">
+                                placeholder="Ingrese el nombre de iluminación" name="txtTip" value="{{acceTxt}}">
                             {%with messages = get_flashed_messages(with_categories=true)%}
                             {%if messages and acceErr%}
                             {% for category, message in messages %}
@@ -86,11 +94,11 @@
 
         <div>
             <h3 class="text-center title_module">
-                Gestión sensores
+                Gestión iluminación
             </h3>
         </div>
 
-        <div>
+        <div class="mb-3">
             <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#perfilModal"> Nuevo
                 sensor</button>
         </div>
@@ -125,22 +133,31 @@
                     <td>{{data.iluminacion}}</td>
                     <td>{{data.status}}</td>
                     <td class="text-center">
-                        <a href="/updateTipIlum/{{data.idtipo_iluminacion}}" class="bi-pencil-fill edit_action" title="edit"
-                            data-bs-toggle="modal" data-bs-target="#editModal{{data.idtipo_iluminacion}}"></a>
-                        <a href="/InhabilTipIlum/{{data.idtipo_iluminacion}}" class="bi bi-ban btn-inhabi" title="Inhabilitar"></a>
+                        <a href="/updateTipIlum/{{data.idtipo_iluminacion}}" class="bi-pencil-fill edit_action"
+                            title="edit" data-bs-toggle="modal"
+                            data-bs-target="#editModal{{data.idtipo_iluminacion}}"></a>
+                        {%if data.status == 'Habilitado'%}
+                        <a href="/InhabilTipIlum/{{data.idtipo_iluminacion}}" class="bi bi-ban btn-inhabi"
+                            title="Inhabilitar"></a>
+                        {%endif%}
+                        {%if data.status == 'Deshabilitado'%}
+                        <a href="/InhabilTipIlum/{{data.idtipo_iluminacion}}" class="bi bi-check-circle btn-habi"
+                            title="Habilitar"></a>
+                        {%endif%}
                         <a href="/deleteTipIlum/{{data.idtipo_iluminacion}}" class="bi-eraser-fill btn-delete"
                             title="delete"></a>
                     </td>
                 </tr>
 
                 <!-- Edicion -->
-                <div class="modal fade" id="editModal{{data.idtipo_iluminacion}}" data-bs-backdrop="static" role="dialog">
+                <div class="modal fade" id="editModal{{data.idtipo_iluminacion}}" data-bs-backdrop="static"
+                    role="dialog">
                     <div class="modal-dialog modal-dialog-scrollable">
 
                         <div class="modal-content">
 
                             <div class="modal-header">
-                                <h5>Editar Sensor</h5>
+                                <h5>Editar iluminación</h5>
                                 <button class="btn-close" data-bs-dismiss="modal" title="exit"></button>
                             </div>
                             <form action="/updateTipIlum/{{data.idtipo_iluminacion}}" method="POST">
@@ -154,18 +171,19 @@
                                     {%endif%}
                                     {%endwith%}
                                     <div class="form-group mb-3 modalForm">
-                                        <label for="exampleInputEmail1">Accesorio</label>
+                                        <label for="exampleInputEmail1">Iluminación</label>
                                         <input type="text" class="form-control" id="exampleInputEmail1"
-                                            aria-describedby="emailHelp" placeholder="Ingrese Accesorio" name="txtAcce"
-                                            value="{{data.iluminacion}}">
-                                            {%with messages = get_flashed_messages(with_categories=true)%}
-                                            {%if messages and acceErrEdit%}
-                                            {% for category, message in messages %}
-                                            <div class="alert alert-{{category}} alert-dismissible fade show mt-3" role="alert">
-                                                {{message}}</div>
-                                            {%endfor%}
-                                            {%endif%}
-                                            {%endwith%}
+                                            aria-describedby="emailHelp" placeholder="Ingrese nombre de iluminación"
+                                            name="txtTip" value="{{data.iluminacion}}">
+                                        {%with messages = get_flashed_messages(with_categories=true)%}
+                                        {%if messages and acceErrEdit%}
+                                        {% for category, message in messages %}
+                                        <div class="alert alert-{{category}} alert-dismissible fade show mt-3"
+                                            role="alert">
+                                            {{message}}</div>
+                                        {%endfor%}
+                                        {%endif%}
+                                        {%endwith%}
                                     </div>
                                     <!-- <div class="form-group mb-4 modalForm">
                                         <label for="exampleInputPassword1">Estado</label>
@@ -209,7 +227,7 @@
                 });
             })
         }
-        
+
         const btninhabili = document.querySelectorAll('.btn-inhabi');
         if (btninhabili) {
             const btnArray = Array.from(btninhabili);
@@ -226,7 +244,7 @@
 
     {% if add_modal %}
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#perfilModal').modal('show');
         });
     </script>
@@ -234,12 +252,8 @@
 
     {% if edit_modal %}
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#editModal{{edit_modal}}').modal('show');
         });
     </script>
     {% endif %}
-
-</body>
-
-</html>
