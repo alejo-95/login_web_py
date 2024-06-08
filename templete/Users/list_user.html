@@ -170,7 +170,14 @@
                     <td class="text-center">
                         <a href="/update/{{data.id}}" class="bi-pencil-fill edit_action" title="editar"
                             data-bs-toggle="modal" data-bs-target="#edit{{data.id}}"></a>
-                        <a href="/InhabilUser/{{data.id}}" class="bi bi-ban btn-inhabi" title="Inhabilitar"></a>
+                        {%if data.status == 'Habilitado'%}
+                        <a href="/InhabilUser/{{data.id}}" class="bi bi-ban btn-inhabi"
+                            title="Inhabilitar"></a>
+                        {%endif%}
+                        {%if data.status == 'Deshabilitado'%}
+                        <a href="/InhabilUser/{{data.id}}" class="bi bi-check-circle btn-habi"
+                            title="Habilitar"></a>
+                        {%endif%}
                         <a href="/delete/{{data.id}}" class="bi-eraser-fill btn-delete" title="eliminar"></a>
                     </td>
                     {%endif%}

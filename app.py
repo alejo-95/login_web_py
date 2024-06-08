@@ -48,6 +48,7 @@ def login():
             session['logueado'] = True
             session['id']= account['id']
             session['idperfil'] = account['idperfil']
+            session['cliente'] = account['cliente']
             
             if session['idperfil'] == 1:
                 return render_template("menu/admin.html")
@@ -286,9 +287,14 @@ def ListUser():
     # cur.execute('SELECT * FROM usuarios')
     # data2 = cur.fetchall()
     
-    cur.execute('SELECT u.id, u.name, u.password, p.perfiles FROM usuarios u inner join perfiles p on u.idperfil = p.idperfiles')
-    data = cur.fetchall()
-    
+    infoCliente=session['cliente']
+    if infoCliente is None or infoCliente == '':
+        cur.execute('SELECT u.id, u.name, u.password, p.perfiles,u.estado FROM usuarios u inner join perfiles p on u.idperfil = p.idperfiles')
+        data = cur.fetchall()
+    else:
+        cur.execute('SELECT u.id, u.name, u.password, p.perfiles,u.estado FROM usuarios u inner join perfiles p on u.idperfil = p.idperfiles where u.cliente = %s',(infoCliente,))
+        data = cur.fetchall()
+        
     cur.execute('SELECT idperfiles, perfiles FROM perfiles where estado = 0')
     dataOpt = cur.fetchall()
     
@@ -306,8 +312,15 @@ def update_employee(id):
         busquedaCC = cur.fetchone()
         cur.execute('Select name from usuarios where id = %s',(id,))
         repe = cur.fetchone()
-        cur.execute('SELECT u.id, u.name, u.password, p.perfiles FROM usuarios u inner join perfiles p on u.idperfil = p.idperfiles')
-        data = cur.fetchall() 
+        
+        infoCliente=session['cliente']
+        if infoCliente is None or infoCliente == '':
+            cur.execute('SELECT u.id, u.name, u.password, p.perfiles,u.estado FROM usuarios u inner join perfiles p on u.idperfil = p.idperfiles')
+            data = cur.fetchall()
+        else:
+            cur.execute('SELECT u.id, u.name, u.password, p.perfiles,u.estado FROM usuarios u inner join perfiles p on u.idperfil = p.idperfiles where u.cliente = %s',(infoCliente,))
+            data = cur.fetchall()
+            
         cur.execute('SELECT idperfiles, perfiles FROM perfiles where estado = 0')
         dataOpt = cur.fetchall()
         cur.close()
@@ -381,8 +394,16 @@ def addUser():
     cur = mysql.connection.cursor()
     cur.execute('Select name from usuarios where name = %s',(correo,))
     busquedaCC = cur.fetchone()
-    cur.execute('SELECT u.id, u.name, u.password, p.perfiles FROM usuarios u inner join perfiles p on u.idperfil = p.idperfiles')
-    data = cur.fetchall() 
+    
+    infoCliente=session['cliente']
+    if infoCliente is None or infoCliente == '':
+        cur.execute('SELECT u.id, u.name, u.password, p.perfiles,u.estado FROM usuarios u inner join perfiles p on u.idperfil = p.idperfiles')
+        data = cur.fetchall()
+    else:
+        cur.execute('SELECT u.id, u.name, u.password, p.perfiles,u.estado FROM usuarios u inner join perfiles p on u.idperfil = p.idperfiles where u.cliente = %s',(infoCliente,))
+        data = cur.fetchall()
+        
+    
     cur.execute('SELECT idperfiles, perfiles FROM perfiles where estado = 0')
     dataOpt = cur.fetchall()
     cur.execute('Select cedula from clientes where cedula =  %s',(cc,))
@@ -411,7 +432,7 @@ def addUser():
     else:
         try:
             cur = mysql.connection.cursor()
-            cur.execute("INSERT INTO usuarios (name, password, idperfil, cliente) VALUES (%s, %s, %s, %s)", (correo, password, perfil_id, cc))
+            cur.execute("INSERT INTO usuarios (name, password, idperfil, cliente, estado) VALUES (%s, %s, %s, %s, 0)", (correo, password, perfil_id, cc))
             mysql.connection.commit()
             cur.close()
             flash('Usuario agregado con exito', 'success')
@@ -423,13 +444,29 @@ def addUser():
 #Inhabilitar
 @app.route('/InhabilUser/<string:id>', methods = ['POST','GET'])
 def InhaUser(id): 
+    
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        Select distinct id, estado
+        from usuarios tp  
+        Where id = %s """,(id))
+    status = cur.fetchone()
+    
     try:
-        cur=mysql.connection.cursor()
-        cur.execute('Update usuarios  set estado = 1 WHERE id = {0}'.format(id))
-        mysql.connection.commit()
-        cur.close()
-        flash('Perfil inhabilitado exitosamente', 'success')
-        return redirect(url_for('ListUser'))
+        if status['estado'] == 0:
+            cur=mysql.connection.cursor()
+            cur.execute('Update usuarios  set estado = 1 WHERE id = {0}'.format(id))
+            mysql.connection.commit()
+            cur.close()
+            flash('Perfil inhabilitado exitosamente', 'success')
+            return redirect(url_for('ListUser'))
+        if status['estado'] == 1:
+            cur=mysql.connection.cursor()
+            cur.execute('Update usuarios  set estado = 0 WHERE id = {0}'.format(id))
+            mysql.connection.commit()
+            cur.close()
+            flash('Perfil habilitado exitosamente', 'success')
+            return redirect(url_for('ListUser'))
     except Exception  as e:
         if '1451' in str(e):
             flash('No se puede inhabilitar el usuario porque está relacionado con otros registros.', 'warning')
@@ -558,25 +595,42 @@ def InhaPerfil(id):
     inner join usuarios d on tp.idperfiles = d.idperfil
     Where tp.idperfiles = %s """,(id))
     inhabi = cur.fetchone()
+    
+    cur.execute("""
+        Select distinct idperfiles, estado
+        from perfiles tp  
+        Where idperfiles = %s """,(id))
+    status = cur.fetchone()
+    
     cur.close()
+    print(status)
+    #print(app.url_map)
+
     
     if inhabi:
         flash('No se puede inhabilitar el perfil porque está relacionado con otros registros.', 'warning')
         return redirect(url_for('ListPerfil'))
-    else:
-    
+    else:   
         try:
-            cur=mysql.connection.cursor()
-            cur.execute('Update perfiles  set estado = 1 WHERE idperfiles = {0}'.format(id))
-            mysql.connection.commit()
-            cur.close()
-            flash('Perfil inhabilitado exitosamente', 'success')
-            return redirect(url_for('ListPerfil'))
+            if status['estado'] == 0:
+                cur=mysql.connection.cursor()
+                cur.execute('Update perfiles  set estado = 1 WHERE idperfiles = {0}'.format(id))
+                mysql.connection.commit()
+                cur.close()
+                flash('Perfil inhabilitado exitosamente', 'success')
+                return redirect(url_for('ListPerfil'))
+            if status['estado'] == 1:
+                cur=mysql.connection.cursor()
+                cur.execute('Update perfiles  set estado = 0 WHERE idperfiles = {0}'.format(id))
+                mysql.connection.commit()
+                cur.close()
+                flash('Perfil habilitado exitosamente', 'success')
+                return redirect(url_for('ListPerfil'))
         except Exception  as e:
             if '1451' in str(e):
-                flash('No se puede inhabilitar el perfil porque está relacionado con otros registros.', 'warning')
+                flash('No se puede eliminar el perfil porque está relacionado con otros registros.', 'warning')
             else:
-                flash('Error al inhabilitar el perfil: {}'.format(str(e)), 'warning')
+                flash('Error al eliminar el accesorio: {}'.format(str(e)), 'warning')
         finally:
             cur.close()
         return redirect(url_for('ListPerfil'))
@@ -746,7 +800,7 @@ def ListArd():
                     End as status
                     FROM tipo_arduino""")
     data = cur.fetchall()
-
+    
     cur.close()
     return render_template('arduinos/list_arduino.html', ard = data)
 #Actualizar
@@ -860,16 +914,31 @@ def InhaArd(id):
     Where idarduinos = %s """,(id))
     inhabi = cur.fetchone()
     
+    cur.execute("""
+        Select distinct idarduinos, estado
+        from tipo_arduino tp  
+        Where idarduinos = %s """,(id))
+    status = cur.fetchone()
+    
+    
+    
     if inhabi:
         flash('No se puede inhabilitar el arduino porque está relacionado con otros registros.', 'warning')
         return redirect(url_for('ListArd'))
     else:  
         try:
-            cur=mysql.connection.cursor()
-            cur.execute('Update tipo_arduino  set estado = 1 WHERE idarduinos = {0}'.format(id))
-            mysql.connection.commit()
-            cur.close()
-            flash('Arduino inhabilitado exitosamente', 'success')
+            if status['estado'] == 0:
+                cur=mysql.connection.cursor()
+                cur.execute('Update tipo_arduino  set estado = 1 WHERE idarduinos = {0}'.format(id))
+                mysql.connection.commit()
+                cur.close()
+                flash('Arduino inhabilitado exitosamente', 'success')
+            if status['estado'] == 1:    
+                cur=mysql.connection.cursor()
+                cur.execute('Update tipo_arduino  set estado = 0 WHERE idarduinos = {0}'.format(id))
+                mysql.connection.commit()
+                cur.close()
+                flash('Arduino habilitado exitosamente', 'success')
             return redirect(url_for('ListArd'))
         except Exception  as e:
             if '1451' in str(e):
@@ -1005,17 +1074,31 @@ def InhaMot(id):
     Where idtipo_motor = %s """,(id))
     inhabi = cur.fetchone()
     
+    cur.execute("""
+        Select distinct idtipo_motor, estado
+        from tipo_motor tp  
+        Where idtipo_motor = %s """,(id))
+    status = cur.fetchone()
+    
     if inhabi:
         flash('No se puede inhabilitar el motor porque está relacionado con otros registros.', 'warning')
         return redirect(url_for('ListMotor'))
     else:  
         try:
-            cur=mysql.connection.cursor()
-            cur.execute('Update tipo_motor  set estado = 1 WHERE idtipo_motor = {0}'.format(id))
-            mysql.connection.commit()
-            cur.close()
-            flash('Motor inhabilitado exitosamente', 'success')
-            return redirect(url_for('ListMotor'))
+            if status['estado'] == 0:
+                cur=mysql.connection.cursor()
+                cur.execute('Update tipo_motor  set estado = 1 WHERE idtipo_motor = {0}'.format(id))
+                mysql.connection.commit()
+                cur.close()
+                flash('Motor inhabilitado exitosamente', 'success')
+                return redirect(url_for('ListMotor'))
+            if status['estado'] == 1:
+                cur=mysql.connection.cursor()
+                cur.execute('Update tipo_motor  set estado = 0 WHERE idtipo_motor = {0}'.format(id))
+                mysql.connection.commit()
+                cur.close()
+                flash('Motor habilitado exitosamente', 'success')
+                return redirect(url_for('ListMotor'))
         except Exception  as e:
             if '1451' in str(e):
                 flash('No se puede inhabilitar el motor porque está relacionado con otros registros.', 'warning')
@@ -1146,17 +1229,31 @@ def InhaTipClient(id):
     Where tp.idtipo_clientes = %s """,(id))
     inhabi = cur.fetchone()
     
+    cur.execute("""
+        Select distinct idtipo_clientes, estado
+        from tipo_clientes tp  
+        Where idtipo_clientes = %s """,(id))
+    status = cur.fetchone()
+    
     if inhabi:
         flash('No se puede inhabilitar el tipo de cliente porque está relacionado con otros registros.', 'warning')
         return redirect(url_for('ListTipClient'))
     else:  
         try:
-            cur=mysql.connection.cursor()
-            cur.execute('Update tipo_clientes  set estado = 1 WHERE idtipo_clientes = {0}'.format(id))
-            mysql.connection.commit()
-            cur.close()
-            flash('Tipo Cliente inhabilitado exitosamente', 'success')
-            return redirect(url_for('ListTipClient'))
+            if status['estado'] == 0:
+                cur=mysql.connection.cursor()
+                cur.execute('Update tipo_clientes  set estado = 1 WHERE idtipo_clientes = {0}'.format(id))
+                mysql.connection.commit()
+                cur.close()
+                flash('Tipo Cliente inhabilitado exitosamente', 'success')
+                return redirect(url_for('ListTipClient'))
+            if status['estado'] == 1:
+                cur=mysql.connection.cursor()
+                cur.execute('Update tipo_clientes  set estado = 0 WHERE idtipo_clientes = {0}'.format(id))
+                mysql.connection.commit()
+                cur.close()
+                flash('Tipo Cliente habilitado exitosamente', 'success')
+                return redirect(url_for('ListTipClient'))
         except Exception  as e:
             if '1451' in str(e):
                 flash('No se puede eliminar el tipo cliente porque está relacionado con otros registros.', 'warning')
@@ -1281,17 +1378,32 @@ def InhaTtamanio(id):
     Where tp.idtamanios = %s """,(id))
     inhabi = cur.fetchone()
     
+    cur.execute("""
+        Select distinct idtamanios, estado
+        from tamanios_invernadero tp  
+        Where idtamanios = %s """,(id))
+    status = cur.fetchone()
+    
+    
     if inhabi:
         flash('No se puede inhabilitar el tamaño porque está relacionado con otros registros.', 'warning')
         return redirect(url_for('ListTamanio'))
     else:   
         try:
-            cur=mysql.connection.cursor()
-            cur.execute('Update tamanios_invernadero  set estado = 1 WHERE idtamanios = {0}'.format(id))
-            mysql.connection.commit()
-            cur.close()
-            flash('Tamaño inhabilitado exitosamente', 'success')
-            return redirect(url_for('ListTamanio'))
+            if status['estado']==0:
+                cur=mysql.connection.cursor()
+                cur.execute('Update tamanios_invernadero  set estado = 1 WHERE idtamanios = {0}'.format(id))
+                mysql.connection.commit()
+                cur.close()
+                flash('Tamaño inhabilitado exitosamente', 'success')
+                return redirect(url_for('ListTamanio'))
+            if status['estado']==1:
+                cur=mysql.connection.cursor()
+                cur.execute('Update tamanios_invernadero  set estado = 0 WHERE idtamanios = {0}'.format(id))
+                mysql.connection.commit()
+                cur.close()
+                flash('Tamaño habilitado exitosamente', 'success')
+                return redirect(url_for('ListTamanio'))
         except Exception  as e:
             if '1451' in str(e):
                 flash('No se puede inhabilitar el tamaño porque está relacionado con otros registros.', 'warning')
@@ -1454,20 +1566,35 @@ def InhaCultivo(id):
     cur.execute("""Select distinct tp.idcultivos
     from cultivos tp
     inner join invernaderos d on tp.idcultivos = d.idcultivo
-    Where tp.idcultivos = %s """,(id))
+    Where tp.idcultivos = %s """,(id,))
     inhabi = cur.fetchone()
+    
+    cur.execute("""
+        Select distinct idcultivos, estado
+        from cultivos tp  
+        Where idcultivos = %s """,(id,))
+    status = cur.fetchone()
+    
     
     if inhabi:
         flash('No se puede inhabilitar el cultivo porque está relacionado con otros registros.', 'warning')
         return redirect(url_for('ListCultivo'))
     else:   
         try:
-            cur=mysql.connection.cursor()
-            cur.execute('Update cultivos  set estado = 1 WHERE idcultivos = {0}'.format(id))
-            mysql.connection.commit()
-            cur.close()
-            flash('Cultivo inhabilitado exitosamente', 'success')
-            return redirect(url_for('ListCultivo'))
+            if status['estado'] ==0:
+                cur=mysql.connection.cursor()
+                cur.execute('Update cultivos  set estado = 1 WHERE idcultivos = {0}'.format(id))
+                mysql.connection.commit()
+                cur.close()
+                flash('Cultivo inhabilitado exitosamente', 'success')
+                return redirect(url_for('ListCultivo'))
+            if status['estado'] ==1:
+                cur=mysql.connection.cursor()
+                cur.execute('Update cultivos  set estado = 0 WHERE idcultivos = {0}'.format(id))
+                mysql.connection.commit()
+                cur.close()
+                flash('Cultivo habilitado exitosamente', 'success')
+                return redirect(url_for('ListCultivo'))
         except Exception  as e:
             if '1451' in str(e):
                 flash('No se puede inhabilitar el Cultivo porque está relacionado con otros registros.', 'warning')
@@ -1756,17 +1883,32 @@ def InhaCliente(id):
     Where tp.idclientes = %s """,(id,))
     inhabi = cur.fetchone()
     
+    cur.execute("""
+        Select distinct idclientes, estado
+        from clientes tp  
+        Where idclientes = %s """,(id,))
+    status = cur.fetchone()
+
+    
     if inhabi:
         flash('No se puede inhabilitar el cliente porque está relacionado con otros registros.', 'warning')
         return redirect(url_for('ListClient'))
     else:   
         try:
-            cur=mysql.connection.cursor()
-            cur.execute('Update clientes  set estado = 1 WHERE idclientes = {0}'.format(id))
-            mysql.connection.commit()
-            cur.close()
-            flash('Cliente inhabilitado exitosamente', 'success')
-            return redirect(url_for('ListClient'))
+            if status['estado'] == 0:
+                cur=mysql.connection.cursor()
+                cur.execute('Update clientes  set estado = 1 WHERE idclientes = {0}'.format(id))
+                mysql.connection.commit()
+                cur.close()
+                flash('Cliente inhabilitado exitosamente', 'success')
+                return redirect(url_for('ListClient'))
+            if status['estado'] == 1:
+                cur=mysql.connection.cursor()
+                cur.execute('Update clientes  set estado = 0 WHERE idclientes = {0}'.format(id))
+                mysql.connection.commit()
+                cur.close()
+                flash('Cliente habilitado exitosamente', 'success')
+                return redirect(url_for('ListClient'))
         except Exception  as e:
             if '1451' in str(e):
                 flash('No se puede eliminar el cliente porque está relacionado con otros registros.', 'warning')
@@ -1802,7 +1944,6 @@ def ListDispo():
     dataOpt3 = cur.fetchall()
     cur.execute('SELECT idtipo_iluminacion, iluminacion FROM tipo_iluminacion where estado = 0')
     dataOpt4 = cur.fetchall()
-    
     
     cur.close()
     return render_template('dispositivos/list_dispo.html', dispo = data, dataOpt= dataOpt, dataOpt2= dataOpt2, dataOpt3=dataOpt3, dataOpt4= dataOpt4)
@@ -1988,17 +2129,31 @@ def InhaDispo(id):
     Where tp.iddispositivo = %s """,(id,))
     inhabi = cur.fetchone()
     
+    cur.execute("""
+        Select distinct iddispositivo, estado
+        from dispositivos tp  
+        Where iddispositivo = %s """,(id,))
+    status = cur.fetchone()
+    
     if inhabi:
         flash('No se puede inhabilitar el dispositivo porque está relacionado con otros registros.', 'warning')
         return redirect(url_for('ListDispo'))
     else:
         try:
-            cur=mysql.connection.cursor()
-            cur.execute('Update dispositivos  set estado = 1 WHERE iddispositivo = {0}'.format(id))
-            mysql.connection.commit()
-            cur.close()
-            flash('El dispositivo se ha inhabilitado exitosamente', 'success')
-            return redirect(url_for('ListDispo'))
+            if status['estado'] == 0:
+                cur=mysql.connection.cursor()
+                cur.execute('Update dispositivos  set estado = 1 WHERE iddispositivo = {0}'.format(id))
+                mysql.connection.commit()
+                cur.close()
+                flash('El dispositivo se ha inhabilitado exitosamente', 'success')
+                return redirect(url_for('ListDispo'))
+            if status['estado'] == 1:
+                cur=mysql.connection.cursor()
+                cur.execute('Update dispositivos  set estado = 0 WHERE iddispositivo = {0}'.format(id))
+                mysql.connection.commit()
+                cur.close()
+                flash('El dispositivo se ha habilitado exitosamente', 'success')
+                return redirect(url_for('ListDispo'))
         except Exception  as e:
             if '1451' in str(e):
                 flash('No se puede inhabilitar el dispositivo porque está relacionado con otros registros.', 'warning')
@@ -2129,17 +2284,31 @@ def InhaTipInv(id):
     Where tp.idtipo_invernadero = %s """,(id,))
     inhabi = cur.fetchone()
     
+    cur.execute("""
+        Select distinct idtipo_invernadero, estado
+        from tipo_invernadero tp  
+        Where idtipo_invernadero = %s """,(id,))
+    status = cur.fetchone()
+    
     if inhabi:
         flash('No se puede inhabilitar el tipo invernadero porque está relacionado con otros registros.', 'warning')
         return redirect(url_for('ListTipInve'))
     else:
         try:
-            cur=mysql.connection.cursor()
-            cur.execute('Update tipo_invernadero  set estado = 1 WHERE idtipo_invernadero = {0}'.format(id))
-            mysql.connection.commit()
-            cur.close()
-            flash('Tipo Invernadero inhabilitado exitosamente', 'success')
-            return redirect(url_for('ListTipInve'))
+            if status['estado'] == 0:
+                cur=mysql.connection.cursor()
+                cur.execute('Update tipo_invernadero  set estado = 1 WHERE idtipo_invernadero = {0}'.format(id))
+                mysql.connection.commit()
+                cur.close()
+                flash('Tipo Invernadero inhabilitado exitosamente', 'success')
+                return redirect(url_for('ListTipInve'))
+            if status['estado'] == 1:
+                cur=mysql.connection.cursor()
+                cur.execute('Update tipo_invernadero  set estado = 0 WHERE idtipo_invernadero = {0}'.format(id))
+                mysql.connection.commit()
+                cur.close()
+                flash('Tipo Invernadero habilitado exitosamente', 'success')
+                return redirect(url_for('ListTipInve'))
         except Exception  as e:
             if '1451' in str(e):
                 flash('No se puede inhabilitar el tipo invernadero porque está relacionado con otros registros.', 'warning')
@@ -2620,13 +2789,28 @@ def deleteInverna(id):
 #Inhabilitar
 @app.route('/InhabilInverna/<string:id>', methods = ['POST','GET'])
 def InhaInverna(id): 
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        Select distinct idinvernaderos, estado
+        from invernaderos tp  
+        Where idinvernaderos = %s """,(id,))
+    status = cur.fetchone()
+    
     try:
-        cur=mysql.connection.cursor()
-        cur.execute('Update invernaderos  set estado = 1 WHERE idinvernaderos = {0}'.format(id))
-        mysql.connection.commit()
-        cur.close()
-        flash('Invernadero inhabilitado exitosamente', 'success')
-        return redirect(url_for('ListInverna'))
+        if status['estado'] == 0:
+            cur=mysql.connection.cursor()
+            cur.execute('Update invernaderos  set estado = 1 WHERE idinvernaderos = {0}'.format(id))
+            mysql.connection.commit()
+            cur.close()
+            flash('Invernadero inhabilitado exitosamente', 'success')
+            return redirect(url_for('ListInverna'))
+        if status['estado'] == 1:
+            cur=mysql.connection.cursor()
+            cur.execute('Update invernaderos  set estado = 0 WHERE idinvernaderos = {0}'.format(id))
+            mysql.connection.commit()
+            cur.close()
+            flash('Invernadero habilitado exitosamente', 'success')
+            return redirect(url_for('ListInverna'))
     except Exception  as e:
         if '1451' in str(e):
             flash('No se puede inhabilitar el invernadero porque está relacionado con otros registros.', 'warning')
@@ -2684,10 +2868,10 @@ def data():
                     day_minut
             """)
             rows = cur.fetchall()
-            print("All Data:", rows)  # Depuración
+            # Depuración
 
             if not rows:
-                return jsonify({'error': 'No data found for all temperatures'})
+                return jsonify({'error': 'No hay datos para mostrar'})
 
             data_all = {
                 'labels': [row['day_minut'] for row in rows],
